@@ -16,7 +16,7 @@ class AlgebraicExpressions:
         print('The equation must include "=" and must include both sides to solve.')
         return [], symbol
     
-    def solve_equation(self, user_input):
+    def solve_algerbraic_equation(self, user_input):
         split_input, symbol = self.process_user_input(user_input)
         if len(split_input) == 2 and symbol:
             try:
@@ -33,5 +33,5 @@ class AlgebraicExpressions:
 if __name__ == '__main__':
     algebraic_exp = AlgebraicExpressions()
     user_input = input('Please type the expression - Eg; x**2 - 15 = 1\nYour input: ')
-    answers = algebraic_exp.solve_equation(user_input)
+    answers = algebraic_exp.solve_algerbraic_equation(user_input)
     print(f'Answers: {answers}')
