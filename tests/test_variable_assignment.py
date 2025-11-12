@@ -21,3 +21,26 @@ def test_reuse_expression_in_calculation(variable_manager_and_expression):
 def test_get_nonexistent_variable_returns_none(variable_manager_and_expression):
     variable_manager, _ = variable_manager_and_expression
     assert variable_manager.get("e2") is None
+
+def test_remove_variable(variable_manager_and_expression):
+    variable_manager, _ = variable_manager_and_expression
+    variable_manager.assign_variable("e1", "x + 1")
+    variable_manager.remove_variable("e1")
+    assert variable_manager.get_variable("e1") is None
+
+def test_remove_variable_that_doesnt_exist(variable_manager_and_expression):
+    variable_manager, _ = variable_manager_and_expression
+    variable_manager.assign_variable("e1", "x + 1")
+    variable_manager.remove_variable("e2")
+    assert str(variable_manager.get_variable("e1")) == "x + 1"
+
+def test_replace_variable(variable_manager_and_expression):
+    variable_manager, _ = variable_manager_and_expression
+    variable_manager.assign_variable("e1", "x + 1")
+    variable_manager.replace_variable("e1", "x**2")
+    assert str(variable_manager.get_variable("e1")) == "x**2"
+
+def test_replace_variable_that_doesnt_exist(variable_manager_and_expression):
+    variable_manager, _ = variable_manager_and_expression
+    variable_manager.assign_variable("e1", "x + 1")
+    variable_manager.replace_variable("e2", "x**2")
