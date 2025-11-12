@@ -1,8 +1,7 @@
 import unittest
-from unittest.mock import patch, call
 
 from sympy import *
-from algebraic_expressions import AlgebraicExpressions
+from app.core.algebraic_expressions import AlgebraicExpressions
 
 class TestAlgebraicExpressions(unittest.TestCase):
     def __init__(self):
