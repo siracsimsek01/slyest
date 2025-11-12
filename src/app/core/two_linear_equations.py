@@ -1,21 +1,17 @@
-
 from sympy import *
 
-class TwoLinearEqa:
+class TwoLinearEquations:
     def __init__(self):
         pass
 
-    def get_equation_symbols(self, eqa):
-        eqa_variable = list()
-        symbols = list()
-        for char in eqa:
+    def get_equation_symbols(self, equation):
+        equation_variables = list()
+        for char in equation:
             if char.isalpha():
-                eqa_variable.append(char)
-                if len(eqa_variable) == 2:
+                equation_variables.append(Symbol(char))
+                if len(equation_variables) == 2:
                     break
-        for var in eqa_variable:
-            symbols.append(Symbol(var))
-        return symbols
+        return equation_variables
     
     def split_input(self, input):
         split_input = input.split('=')
@@ -24,12 +20,12 @@ class TwoLinearEqa:
         else:
             return []
 
-    def solve_two_algerbraic_equations(self, eqa_1, eqa_2):
-        split_input_1 = self.split_input(eqa_1)
-        split_input_2 = self.split_input(eqa_2)
-        symbols = self.sol_eqa_input(eqa_1)
+    def solve_two_linear_equations(self, equation_1, equation_2):
+        split_input_1 = self.split_input(equation_1)
+        split_input_2 = self.split_input(equation_2)
+        symbols = self.get_equation_symbols(equation_1)
         if len(symbols) != 2:
-            symbols = self.sol_eqa_input(eqa_2)
+            symbols = self.get_equation_symbols(equation_2)
 
         if len(split_input_1) == 2 and len(split_input_2) == 2 and len(symbols) == 2:
             try:
@@ -51,8 +47,8 @@ class TwoLinearEqa:
             return None
         
 if __name__ == '__main__':
-    two_linear_equation_solver = TwoLinearEqa()
-    eqa_1 = input("Please enter the first correct format of equation: ")
-    eqa_2 = input("Please enter the second correct format of equation: ")
-    answers = two_linear_equation_solver.solve_two_algerbraic_equations(eqa_1, eqa_2)
+    two_linear_equation_solver = TwoLinearEquations()
+    equation_1 = input("Please enter the first correct format of equation: ")
+    equation_2 = input("Please enter the second correct format of equation: ")
+    answers = two_linear_equation_solver.solve_two_linear_equations(equation_1, equation_2)
     print(f'Answers: {answers}')
