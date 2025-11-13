@@ -123,12 +123,19 @@ class MainWindow(QMainWindow):
         
         self.history_list = QListWidget()
         layout.addWidget(self.history_list)
+        self.history_list.itemClicked.connect(self.show_calculations_when_clicked)
         
         clear_btn = QPushButton("Clear History")
         clear_btn.clicked.connect(self.clear_history)
         layout.addWidget(clear_btn)
         
         return panel
+    
+    def show_calculations_when_clicked(self, item):
+        entry = item.data(Qt.ItemDataRole.UserRole)
+        if entry:
+            self.input_field.setText(entry.input_expr)
+        self.output_display.clear()
     
     def apply_stylesheet(self):
         """Apply a basic stylesheet for better appearance"""
@@ -173,8 +180,10 @@ class MainWindow(QMainWindow):
             from ..core.session import HistoryEntry
             entry = HistoryEntry("Simplify", expr_str, result)
             self.session.history.append(entry)
-            self.history_list.addItem(str(entry))
-            
+            item = QListWidgetItem(str(entry))
+            item.setData(Qt.ItemDataRole.UserRole, entry)
+            self.history_list.addItem(item)
+
             self.statusBar().showMessage("Simplified successfully")
             
         except Exception as e:
@@ -196,7 +205,10 @@ class MainWindow(QMainWindow):
             from ..core.session import HistoryEntry
             entry = HistoryEntry("Expand", expr_str, result)
             self.session.history.append(entry)
-            self.history_list.addItem(str(entry))
+            item = QListWidgetItem(str(entry))
+            item.setData(Qt.ItemDataRole.UserRole, entry)
+            self.history_list.addItem(item)
+            
             
             self.statusBar().showMessage("Expanded successfully")
             
@@ -220,7 +232,9 @@ class MainWindow(QMainWindow):
             from ..core.session import HistoryEntry
             entry = HistoryEntry("Factor", expr_str, result)
             self.session.history.append(entry)
-            self.history_list.addItem(str(entry))
+            item = QListWidgetItem(str(entry))
+            item.setData(Qt.ItemDataRole.UserRole, entry)
+            self.history_list.addItem(item)
             
             self.statusBar().showMessage("Factored successfully")
             
