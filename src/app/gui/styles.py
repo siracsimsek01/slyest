@@ -1,0 +1,145 @@
+# global styles for the app
+
+COLORS = {
+    # Background colors
+    'main_bg': '#1C1C1E',  
+    'display_bg': '#2C2C2E', 
+
+    # Button colors
+    'number_btn': '#505050', 
+    'operation_btn': '#FF9F0A',  
+    'scientific_btn': '#3A3A3C',  
+    'special_btn': '#A5A5A5',  
+
+    # Text colors
+    'text_white': '#FFFFFF',
+    'text_black': '#000000',
+    'text_gray': '#A0A0A0',
+}
+
+
+CALCULATOR_STYLESHEET = f"""
+    /* Main window background */
+    QMainWindow {{
+        background-color: {COLORS['main_bg']};
+    }}
+
+    /* Central widget */
+    QWidget {{
+        background-color: {COLORS['main_bg']};
+        color: {COLORS['text_white']};
+    }}
+
+    /* Display label */
+    QLabel#display {{
+        background-color: {COLORS['display_bg']};
+        color: {COLORS['text_white']};
+        border-radius: 10px;
+        padding: 20px;
+        font-size: 48pt;
+        font-weight: bold;
+        qproperty-alignment: 'AlignRight | AlignVCenter';
+    }}
+
+    /* Subdisplay label (for showing the expression being typed) */
+    QLabel#subdisplay {{
+        background-color: {COLORS['display_bg']};
+        color: {COLORS['text_gray']};
+        border-radius: 5px;
+        padding: 10px 20px;
+        font-size: 18pt;
+        qproperty-alignment: 'AlignRight | AlignVCenter';
+    }}
+
+    /* Variable bar at top */
+    QWidget#variableBar {{
+        background-color: {COLORS['display_bg']};
+        border-radius: 8px;
+        padding: 8px;
+    }}
+
+    /* Variable chip button */
+    QPushButton#variableChip {{
+        background-color: {COLORS['scientific_btn']};
+        color: {COLORS['text_white']};
+        border: none;
+        border-radius: 12px;
+        padding: 6px 12px;
+        font-size: 11pt;
+        font-weight: bold;
+    }}
+
+    QPushButton#variableChip:hover {{
+        background-color: {COLORS['number_btn']};
+    }}
+
+    /* Manage variables button */
+    QPushButton#manageVarsBtn {{
+        background-color: {COLORS['operation_btn']};
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 6px 12px;
+        font-size: 11pt;
+        font-weight: bold;
+    }}
+
+    QPushButton#manageVarsBtn:hover {{
+        background-color: #E68A00;
+    }}
+
+    /* History panel */
+    QWidget#historyPanel {{
+        background-color: {COLORS['display_bg']};
+        border-radius: 8px;
+        padding: 10px;
+    }}
+
+    /* History list widget */
+    QListWidget#historyList {{
+        background-color: {COLORS['main_bg']};
+        color: {COLORS['text_white']};
+        border: none;
+        border-radius: 6px;
+        padding: 5px;
+        font-family: 'Courier';
+        font-size: 11pt;
+    }}
+
+    QListWidget#historyList::item {{
+        padding: 8px;
+        border-radius: 4px;
+    }}
+
+    QListWidget#historyList::item:hover {{
+        background-color: {COLORS['scientific_btn']};
+    }}
+
+    QListWidget#historyList::item:selected {{
+        background-color: {COLORS['number_btn']};
+    }}
+
+    /* History toggle button */
+    QPushButton#historyToggle {{
+        background-color: transparent;
+        color: {COLORS['text_gray']};
+        border: 1px solid {COLORS['text_gray']};
+        border-radius: 8px;
+        padding: 4px 10px;
+        font-size: 10pt;
+    }}
+
+    QPushButton#historyToggle:hover {{
+        background-color: {COLORS['scientific_btn']};
+        color: {COLORS['text_white']};
+    }}
+"""
+
+def get_calculator_stylesheet():
+    """Returns the global stylesheet for the calculator app."""
+    return CALCULATOR_STYLESHEET
+
+
+def get_dark_theme_colors():
+    """returns the color scheme for the dark theme."""
+    return COLORS
