@@ -84,6 +84,14 @@ class MainWindow(QMainWindow):
         self.input_field.setPlaceholderText("e.g., x**2 + 2*x + 1")
         layout.addWidget(self.input_field)
         
+        optional_input_label = QLabel("Optional: Only input a substitute value for substitution <or> second equation for solving two linear equations.")
+        layout.addWidget(optional_input_label)
+        
+        self.input_field = QLineEdit()
+        self.input_field.setPlaceholderText("e.g., x=5, y=3 for substitution <or> x - y = 12 for solving two linear equations.")
+        layout.addWidget(self.input_field)
+        layout.addSpacing(20)
+        
         # Operation buttons
         button_layout = QHBoxLayout()
         
