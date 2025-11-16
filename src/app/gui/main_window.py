@@ -3,6 +3,7 @@ from ..core.symbolic_engine import SymbolicEngine
 from ..core.session import SessionManager
 from ..utils.helpers import format_expression, validate_expression
 from src.app.core.perform_substitution import perform_substitution
+from src.app.core.algebraic_expressions import AlgebraicExpressions
 from src.app.core.two_linear_equations import TwoLinearEquations
 from src.app.core.variable_assignment import VariableManager
 
@@ -22,10 +23,11 @@ class MainWindow(QMainWindow):
 
         self.engine = SymbolicEngine()
         self.session = SessionManager()
-        self.substitution = QPushButton("Substitution")
-        self.variable_assignment = QPushButton("Variable Assignment")
-        self.two_linear_equations = QPushButton("Two Linear Equation")
-
+        self.substitution = QPushButton("Substitute")
+        self.solve_equation = QPushButton("Solve one equation")
+        self.solve_two_linear_equations = QPushButton("Solve two equations")
+        self.equations_solver = AlgebraicExpressions()
+        self.two_linear_equations_solver = TwoLinearEquations()
         
         
         self.init_ui()
@@ -96,9 +98,9 @@ class MainWindow(QMainWindow):
         optional_input_label = QLabel("Optional: Only input a substitute value for substitution <or> second equation for solving two linear equations.")
         layout.addWidget(optional_input_label)
         
-        self.input_field = QLineEdit()
-        self.input_field.setPlaceholderText("e.g., x=5, y=3 for substitution <or> x - y = 12 for solving two linear equations.")
-        layout.addWidget(self.input_field)
+        self.optional_input_field = QLineEdit()
+        self.optional_input_field.setPlaceholderText("e.g., x=5, y=3 for substitution <or> x - y = 12 for solving two linear equations.")
+        layout.addWidget(self.optional_input_field)
         layout.addSpacing(20)
         
         # Operation buttons
@@ -125,15 +127,15 @@ class MainWindow(QMainWindow):
         my_buttons_layout = QHBoxLayout()
 
         my_buttons_layout.addWidget(self.substitution)
-        my_buttons_layout.addWidget(self.variable_assignment)
-        my_buttons_layout.addWidget(self.two_linear_equations)
+        my_buttons_layout.addWidget(self.solve_equation)
+        my_buttons_layout.addWidget(self.solve_two_linear_equations)
 
         layout.addLayout(my_buttons_layout)
 
 
         self.substitution.clicked.connect(self.on_substitution_clicked)
-        self.variable_assignment.clicked.connect(self.on_variable_assignment_clicked)
-        self.two_linear_equations.clicked.connect(self.on_two_linear_equations_clicked)
+        self.solve_equation.clicked.connect(self.on_solve_equation_clicked)
+        self.solve_two_linear_equations.clicked.connect(self.on_two_linear_equations_clicked)
         
         layout.addSpacing(10)
 
@@ -173,6 +175,7 @@ class MainWindow(QMainWindow):
         entry = item.data(Qt.ItemDataRole.UserRole)
         if entry:
             self.input_field.setText(entry.input_expr)
+            self.optional_input_field.setText(entry.optional_input_expr)
         self.output_display.clear()
     
     def apply_stylesheet(self):
@@ -295,16 +298,16 @@ class MainWindow(QMainWindow):
     
     ######
     def on_substitution_clicked(self):
-        expr_str = self.expression_input.text()
-        subs_str = self.substitution_input.text()
+        expr_str = self.input_field.text()
+        subs_str = self.optional_input_field.text()
 
         #Check for empty inputs
         if not expr_str:
-            self.output_display.setPlainText("Error: Expression field is empty.")
+            QMessageBox.critical(self, "Error", "Error: Expression field is empty.")
             return
             
         if not subs_str:
-            self.output_display.setPlainText("Error: Substitution field is empty.")
+            QMessageBox.critical(self, "Error", "Error: Substitution field is empty.")
             return
         
         subs_dict = {} #example turns a string "x=5, y=3" into a dict {'x': '5', 'y': '3'}
@@ -328,10 +331,9 @@ class MainWindow(QMainWindow):
             self.output_display.setPlainText(result)
             self.statusBar().showMessage("Substitution successful")
             from ..core.session import HistoryEntry
-            display_text = f"Substitution: {expr_str}  |  Subs: {subs_str}"
             entry = HistoryEntry("Substitution", expr_str, str(result), subs_str)
 
-            item = QListWidgetItem(display_text)   
+            item = QListWidgetItem(str(entry))   
             item.setData(Qt.ItemDataRole.UserRole, entry)     
             self.history_list.addItem(item)
             self.session.history.append(entry)
@@ -341,37 +343,36 @@ class MainWindow(QMainWindow):
             self.statusBar().showMessage("Substitution failed")
         
    
-    def on_variable_assignment_clicked(self):
+    def on_solve_equation_clicked(self):
         
         try:
             
-            expr_str = self.expression_input.text()
+            expr_str = self.input_field.text()
 
             
             if not expr_str:
-                self.output_display.setPlainText("Error: Expression field is empty.")
+                QMessageBox.critical(self, "Input Error", "Error: Expression field is empty.")
                 return
 
             
-            result, success = VariableManager(expr_str)
+            result = self.equations_solver.solve_algerbraic_equation(expr_str)
 
             
-            if success:
-                self.output_display.setPlainText(result)
-                self.statusBar().showMessage("Variable assigned")
+            if result:
+                self.output_display.setPlainText(str(result))
+                self.statusBar().showMessage("Algebraic equation solved")
                 
                 
                 from ..core.session import HistoryEntry
-                display_text = f"Assignment: {expr_str}"
                 entry = HistoryEntry("Assignment", expr_str, str(result))
-                item = QListWidgetItem(display_text)
+                item = QListWidgetItem(str(entry))
                 item.setData(Qt.ItemDataRole.UserRole, entry) 
                 self.history_list.addItem(item)
                 self.session.history.append(entry)
                 
             else:
-                QMessageBox.critical(self, "Error", result)
-                self.statusBar().showMessage("Assignment failed")
+                QMessageBox.critical(self, "Error", "Error in input equation. Please type again.")
+                self.statusBar().showMessage("Solving equation failed")
 
         except Exception as e:
             QMessageBox.critical(self, "Critical Error", f"An unexpected error occurred: {e}")
@@ -380,33 +381,39 @@ class MainWindow(QMainWindow):
     def on_two_linear_equations_clicked(self):
         try:
             
-            expr_str = self.expression_input.text()
+            expr_str_1 = self.input_field.text()
+            expr_str_2 = self.optional_input_field.text()
 
             
-            if not expr_str:
-                self.output_display.setPlainText("Error: Expression field is empty.")
+            if not expr_str_1 and expr_str_2:
+                QMessageBox.critical(self, "Input Error", "Error: Expression field is empty.")
                 return
 
             
-            result, success = TwoLinearEquations(expr_str)
+            result = self.two_linear_equations_solver.solve_two_linear_equations(expr_str_1, expr_str_2)
 
             
-            if success:
-                self.output_display.setPlainText(result)
-                self.statusBar().showMessage("Variable assigned")
+            if result:
+                result_str = ""
+                for var in result:
+                    if type(var) == tuple:
+                        result_str += ''.join(str(var))
+                    else:
+                        result_str += f'{var}: {result[var]}   '
+                self.output_display.setPlainText(result_str)
+                self.statusBar().showMessage("Two linear equations solved")
                 
                 
                 from ..core.session import HistoryEntry
-                display_text = f"Assignment: {expr_str}"
-                entry = HistoryEntry("Assignment", expr_str, str(result))
-                item = QListWidgetItem(display_text)
+                entry = HistoryEntry("Assignment", expr_str_1, str(result), expr_str_2)
+                item = QListWidgetItem(str(entry))
                 item.setData(Qt.ItemDataRole.UserRole, entry) 
                 self.history_list.addItem(item)
                 self.session.history.append(entry)
                 
             else:
-                QMessageBox.critical(self, "Error", result)
-                self.statusBar().showMessage("Assignment failed")
+                QMessageBox.critical(self, "Error", "Error in input equation. Please type again.")
+                self.statusBar().showMessage("Solving two linear equations failed")
 
         except Exception as e:
             QMessageBox.critical(self, "Critical Error", f"An unexpected error occurred: {e}")

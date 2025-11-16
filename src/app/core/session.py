@@ -6,9 +6,10 @@ import sympy as sp
 
 class HistoryEntry:
     
-    def __init__(self, operation: str, input_expr: str, result: sp.Expr, timestamp: Optional[datetime] = None):
+    def __init__(self, operation: str, input_expr: str, result: sp.Expr, optional_input_expr=None, timestamp: Optional[datetime] = None):
         self.operation = operation  # simplify, differentiate
         self.input_expr = input_expr  # The expression before calculation
+        self.optional_input_expr = optional_input_expr
         self.result = result  # The resulting expression
         self.timestamp = timestamp if timestamp else datetime.now()  # When it was done
         
@@ -18,12 +19,15 @@ class HistoryEntry:
         return {
             'operation': self.operation,
             'input_expr': self.input_expr,
+            'optional_input_expr': self.operation,
             'result': str(self.result),
             'timestamp': self.timestamp.isoformat()
         }
 
     def __str__(self) -> str:
         """Make it look nice when we print it."""
+        if self.optional_input_expr:
+            return f"[{self.timestamp.strftime('%H:%M:%S')}] {self.operation}: {self.input_expr}| {self.optional_input_expr} → {self.result}"
         return f"[{self.timestamp.strftime('%H:%M:%S')}] {self.operation}: {self.input_expr} → {self.result}"
     
     
