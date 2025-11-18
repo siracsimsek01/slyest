@@ -13,7 +13,7 @@ class VariableManager:
     def remove_variable(self, name):
         return self.variables.pop(name, None)
     
-    def replace_variable(self, name: str, new_expression: str):
+    def replace_variable(self, name, new_expression):
         if name in self.variables:
             self.variables[name] = sympify(new_expression)
             return True

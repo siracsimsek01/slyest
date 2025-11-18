@@ -58,14 +58,14 @@ def test_variable_used_in_subtraction(variable_manager_and_expression):
     variable_manager.assign_variable("e1", "x + 1")
     expr = variable_manager.get_variable("e1")
     result = expr - x
-    assert str(result) == "1" 
+    assert result == 1 
 
 def test_variable_used_in_division(variable_manager_and_expression):
     variable_manager, x = variable_manager_and_expression
     variable_manager.assign_variable("e1", "x + 1")
     expr = variable_manager.get_variable("e1")
     result = expr / x
-    assert str(result) == "(x + 1)/x"
+    assert result == (x + 1)/x
 
 def test_chained_calculations(variable_manager_and_expression):
     variable_manager, x = variable_manager_and_expression
