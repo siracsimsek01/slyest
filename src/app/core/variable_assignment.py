@@ -11,16 +11,13 @@ class VariableManager:
         return self.variables.get(name)
     
     def remove_variable(self, name):
-        try:
-            self.variables.pop(name)
-        except KeyError:
-            print(f'Variable {name} is not defined yet.')
+        return self.variables.pop(name, None)
     
-    def replace_variable(self, name, expression):
-        try:
-            self.variables[name] = sympify(expression)
-        except KeyError:
-            print(f'Variable {name} is not defined yet.')
+    def replace_variable(self, name: str, new_expression: str):
+        if name in self.variables:
+            self.variables[name] = sympify(new_expression)
+            return True
+        return False  
 
 if __name__ == '__main__':
     variable_manager = VariableManager()
