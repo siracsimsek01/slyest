@@ -40,18 +40,8 @@ CALCULATOR_STYLESHEET = f"""
         color: {COLORS['text_white']};
         border-radius: 10px;
         padding: 20px;
-        font-size: 48pt;
+        font-size: 40pt;
         font-weight: bold;
-        qproperty-alignment: 'AlignRight | AlignVCenter';
-    }}
-
-    /* Subdisplay label (for showing the expression being typed) */
-    QLabel#subdisplay {{
-        background-color: {COLORS['display_bg']};
-        color: {COLORS['text_gray']};
-        border-radius: 5px;
-        padding: 10px 20px;
-        font-size: 18pt;
         qproperty-alignment: 'AlignRight | AlignVCenter';
     }}
 
@@ -67,6 +57,20 @@ CALCULATOR_STYLESHEET = f"""
     }}
 
     QLineEdit#expressionInput:focus {{
+        border: 2px solid {COLORS['operation_btn']};
+    }}
+
+    QLineEdit#optionalExpressionInput {{
+        background-color: {COLORS['display_bg']};
+        color: {COLORS['text_white']};
+        border: 2px solid {COLORS['scientific_btn']};
+        border-radius: 8px;
+        padding: 8px 15px;
+        font-size: 14pt;
+        font-family: 'Courier';
+    }}
+
+    QLineEdit#optionalExpressionInput:focus {{
         border: 2px solid {COLORS['operation_btn']};
     }}
 

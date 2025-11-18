@@ -1,13 +1,7 @@
-
-#  necessary packages to be used in the main window GUI
-
-
 from PyQt6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
-    QLabel, QPushButton, QLineEdit
+    QLabel, QPushButton, QLineEdit, QListWidgetItem
 )
-from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QFont
 
 from ..core.symbolic_engine import SymbolicEngine
 from ..core.plotter import ExpressionPlotter
@@ -16,6 +10,9 @@ from ..gui.styles import get_calculator_stylesheet
 from ..gui.variable_window import VariableWindow
 from ..gui.history_panel import HistoryPanel
 from ..gui.calculator_operations import CalculatorOperations
+from src.app.core.perform_substitution import perform_substitution
+from src.app.core.algebraic_expressions import AlgebraicExpressions
+from src.app.core.two_linear_equations import TwoLinearEquations
 
 
 class MainWindow(QMainWindow):
@@ -27,6 +24,8 @@ class MainWindow(QMainWindow):
 
         # create the calculation engine
         self.engine = SymbolicEngine()
+        self.equation_solver = AlgebraicExpressions()
+        self.two_equations_solver = TwoLinearEquations()
 
         # create the operations handler (this does all the button logic)
         self.operations = CalculatorOperations(self.engine)
@@ -113,18 +112,21 @@ class MainWindow(QMainWindow):
         self.expression_input = QLineEdit()
         self.expression_input.setObjectName("expressionInput")
         self.expression_input.setPlaceholderText("Type expression: 2*x + 5, sin(x), x**2...")
+
+        self.optional_expression_input = QLineEdit()
+        self.optional_expression_input.setObjectName("optionalExpressionInput")
+        self.optional_expression_input.setPlaceholderText("Optional: e.g., x=5, y=3 for substitution <or> x - y = 12 for solving two linear equations....")
+
         self.expression_input.setMinimumHeight(40)
         self.expression_input.returnPressed.connect(self.handle_expression_input)
         parent_layout.addWidget(self.expression_input)
 
+        self.optional_expression_input.setMinimumHeight(40)
+        self.optional_expression_input.returnPressed.connect(self.handle_optional_expression_input)
+        parent_layout.addWidget(self.optional_expression_input)
+
         # symbolic operation buttons (simplify, expand, etc)
         self.create_symbolic_buttons(parent_layout)
-
-        # subdisplay for the expression being typed
-        self.subdisplay = QLabel("0")
-        self.subdisplay.setObjectName("subdisplay")
-        self.subdisplay.setMinimumHeight(35)
-        parent_layout.addWidget(self.subdisplay)
 
         # main display for results
         self.display = QLabel("0")
@@ -166,14 +168,14 @@ class MainWindow(QMainWindow):
         # substitute button
         substitute_btn = QPushButton("Substitute")
         substitute_btn.setObjectName("symbolicBtn")
-        substitute_btn.clicked.connect(self.handle_substitute)
+        substitute_btn.clicked.connect(lambda: self.handle_symbolic_operation('substitute'))
         button_layout.addWidget(substitute_btn)
 
         # plot button
-        plot_btn = QPushButton("Plot")
-        plot_btn.setObjectName("symbolicBtn")
-        plot_btn.clicked.connect(self.handle_plot)
-        button_layout.addWidget(plot_btn)
+        solve_2_equations_btn = QPushButton("Solve 2 Equations")
+        solve_2_equations_btn.setObjectName("symbolicBtn")
+        solve_2_equations_btn.clicked.connect(lambda: self.handle_symbolic_operation('solve 2 equations'))
+        button_layout.addWidget(solve_2_equations_btn)
 
         parent_layout.addWidget(button_container)
 
@@ -425,7 +427,7 @@ class MainWindow(QMainWindow):
     def insert_variable(self, var_name: str):
         """Insert a variable name into the current expression."""
         self.current_expression += var_name
-        self.subdisplay.setText(self.current_expression)
+        self.expression_input.setText(self.current_expression)
 
     def toggle_history(self):
         """toggle the history panel visibility."""
@@ -441,7 +443,7 @@ class MainWindow(QMainWindow):
     def use_history_item(self, expression: str):
         """Use an expression from history."""
         self.current_expression = expression
-        self.subdisplay.setText(self.current_expression)
+        self.expression_input.setText(self.current_expression)
 
     def handle_expression_input(self):
         """when user types expression and presses enter"""
@@ -453,6 +455,9 @@ class MainWindow(QMainWindow):
     ### button handlers
     # TODO: connect all buttons to these handlers
 
+    def handle_optional_expression_input(self):
+        pass
+
     def connect_button_to_operation(self, button: CalculatorButton, operation_func):
         """helper to connect button to function"""
         button.clicked.connect(operation_func)
@@ -461,7 +466,7 @@ class MainWindow(QMainWindow):
         """when number buttons (0-9) are clicked"""
         result = self.operations.input_number(digit)
         if result is not None:
-            self.subdisplay.setText(result)
+            self.expression_input.setText(result)
 
     def handle_operation_click(self, operation_name: str):
         """when +, -, ×, ÷ buttons clicked"""
@@ -475,14 +480,14 @@ class MainWindow(QMainWindow):
             result = self.operations.operation_divide()
 
         if result is not None:
-            self.subdisplay.setText(result)
+            self.expression_input.setText(result)
 
     def handle_equals_click(self):
         """= button - calculate and show result"""
         result = self.operations.calculate_result()
         if result is not None:
             expression, answer = result
-            self.subdisplay.setText(expression)
+            self.expression_input.setText(expression)
             self.display.setText(answer)
             self.history_panel.add_calculation(expression, answer)
 
@@ -490,7 +495,7 @@ class MainWindow(QMainWindow):
         """AC button - clear everything"""
         result = self.operations.clear_all()
         if result is not None:
-            self.subdisplay.setText(result)
+            self.expression_input.setText(result)
             self.display.setText(result)
 
     def handle_scientific_function_click(self, function_name: str):
@@ -532,13 +537,13 @@ class MainWindow(QMainWindow):
             result = self.operations.factorial()
 
         if result is not None:
-            self.subdisplay.setText(result)
+            self.expression_input.setText(result)
 
     def handle_decimal_click(self):
         """decimal point button"""
         result = self.operations.input_decimal()
         if result is not None:
-            self.subdisplay.setText(result)
+            self.expression_input.setText(result)
 
     def handle_parenthesis_click(self, paren_type: str):
         """parenthesis buttons"""
@@ -548,7 +553,7 @@ class MainWindow(QMainWindow):
             result = self.operations.close_parenthesis()
 
         if result is not None:
-            self.subdisplay.setText(result)
+            self.expression_input.setText(result)
 
     def handle_constant_click(self, constant: str):
         """constant buttons like e and π"""
@@ -558,7 +563,7 @@ class MainWindow(QMainWindow):
             result = self.operations.insert_constant_pi()
 
         if result is not None:
-            self.subdisplay.setText(result)
+            self.expression_input.setText(result)
 
     def handle_memory_click(self, action: str):
         """memory buttons - mc, m+, m-, mr"""
@@ -572,7 +577,7 @@ class MainWindow(QMainWindow):
             result = self.operations.memory_recall()
 
         if result is not None:
-            self.subdisplay.setText(result)
+            self.expression_input.setText(result)
 
     def handle_special_click(self, action: str):
         """special buttons - ±, %, Rand, EE, Rad, 2nd"""
@@ -597,25 +602,37 @@ class MainWindow(QMainWindow):
             result = self.operations.toggle_second_function()
 
         if result is not None:
-            self.subdisplay.setText(result)
+            self.expression_input.setText(result)
 
     def handle_symbolic_operation(self, operation: str):
-        """simplify/expand/factor/solve buttons"""
-        # TODO: get expr from expression_input
-        # TODO: call self.engine.simplify() or expand() etc based on operation
-        # TODO: show result
-        pass
-
-    def handle_substitute(self):
-        """substitute variables with values"""
-        # TODO: get expression
-        # TODO: ask user what to substitute (dialog?)
-        # TODO: call engine.substitute()
-        pass
-
-    def handle_plot(self):
-        """plot button - graph the expression"""
-        # TODO: get expr from expression_input
-        # TODO: call self.plotter.create_plot()
-        # TODO: show in new window
-        pass
+        try:
+            expression_string = self.expression_input.text()
+            optional_expression_string = self.optional_expression_input.text()
+            if not expression_string:
+                return
+            if operation == "simplify":
+                result = str(self.engine.simplify(expression_string))
+            elif operation == 'expand':
+                result = str(self.engine.expand(expression_string))
+            elif operation == 'factor':
+                result = str(self.engine.factor(expression_string))
+            elif operation == 'solve':
+                result = str(self.equation_solver.solve_algerbraic_equation(expression_string))
+            elif operation == 'substitute':
+                substituted_values = self.get_substituted_values(optional_expression_string)
+                result, success = perform_substitution(expression_string, substituted_values)
+            elif operation == 'solve 2 equations':
+                result = str(self.two_equations_solver.solve_two_linear_equations(expression_string, optional_expression_string))
+            self.display.setText(result)
+        except:
+            return
+        
+    def get_substituted_values(self, subs_str):
+        subs_dict = {}
+        try:
+            for part in subs_str.split(','):
+                key, value = part.split('=')
+                subs_dict[key.strip()] = value.strip()
+            return subs_dict
+        except Exception as e:
+            return {}

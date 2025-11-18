@@ -53,16 +53,13 @@ class HistoryPanel(QWidget):
         instructions.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(instructions)
         
-    def add_calculation(self, expression: str, result: str):
-        """
-        add a calculation to history
-
-        Args:
-            expression: the expression string
-            result: the result of the calculation
-        """
-        #format expression = result 
-        item_text = f"{expression} = {result}"
+    def add_calculation(self, expression: str, result: str, operation=None, optional_expression=None):
+        if operation:
+            item_text = f"{operation}: {expression} => {result}"
+            if optional_expression:
+                item_text = f"{operation}: {expression}, {optional_expression} => {result}"
+        else:
+            item_text = f"{expression} = {result}"
         
         # create list item
         item = QListWidgetItem(item_text)
