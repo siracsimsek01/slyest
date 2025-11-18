@@ -35,7 +35,7 @@ A Python-based desktop application for symbolic (non-numerical) calculations inc
 ### 1. Clone or Download the Project
 
 ```bash
-cd /path/to/slyest
+cd /path/to/Group_Project
 ```
 
 ### 2. Create Virtual Environment

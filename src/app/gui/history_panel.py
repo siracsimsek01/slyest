@@ -13,10 +13,9 @@ class HistoryPanel(QWidget):
     history_item_selected = pyqtSignal(str)
     
     def __init__(self, parent=None):
-        ### create the history panel
+        ### create the history panel
         super().__init__(parent)
         self.setObjectName("historyPanel")
-        self.isVisible = False
         self.init_ui()
         
     def init_ui(self):
@@ -54,16 +53,13 @@ class HistoryPanel(QWidget):
         instructions.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(instructions)
         
-    def add_calculation(self, expression: str, result: str):
-        """
-        add a calculation to history
-
-        Args:
-            expression: the expression string
-            result: the result of the calculation
-        """
-        #format expression = result 
-        item_text = f"{expression} = {result}"
+    def add_calculation(self, expression: str, result: str, operation=None, optional_expression=None):
+        if operation:
+            item_text = f"{operation}: {expression} => {result}"
+            if optional_expression:
+                item_text = f"{operation}: {expression}, {optional_expression} => {result}"
+        else:
+            item_text = f"{expression} = {result}"
         
         # create list item
         item = QListWidgetItem(item_text)
@@ -77,17 +73,16 @@ class HistoryPanel(QWidget):
             self.history_list.takeItem(self.history_list.count() - 1)
             
     def on_item_clicked(self, item: QListWidgetItem):
-              # Get the stored expression
+              # get the stored expression
         expression = item.data(Qt.ItemDataRole.UserRole)
 
-        # Emit signal so calculator can use it
+        # emit signal so calculator can use it
         self.history_item_selected.emit(expression)
 
     def clear_history(self):
-        """Clear all history items."""
+        """clear all history items."""
         self.history_list.clear()
 
     def toggle_visibility(self):
         """Toggle between showing and hiding the history panel."""
-        self.is_visible = not self.is_visible
-        self.setVisible(self.is_visible)
+        self.setVisible(not self.isVisible())

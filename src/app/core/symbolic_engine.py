@@ -21,3 +21,70 @@ class SymbolicEngine:
         except Exception as e:
             # If something went wrong, tell the user what happened
             raise ValueError(f"Failed to parse expression: {str(e)}")
+
+    def simplify(self, expr: Union[str, sp.Expr]) -> sp.Expr:
+        """simplify the expression."""
+        if isinstance(expr, str):
+            expr = self.parse_expression(expr)
+        return sp.simplify(expr)
+    
+    def expand(self, expr: Union[str, sp.Expr]) -> sp.Expr:
+        """expand the expression."""
+        if isinstance(expr, str):
+            expr = self.parse_expression(expr)
+        return sp.expand(expr)
+    
+    def factor(self, expr: Union[str, sp.Expr]) -> sp.Expr:
+        """factor the expression."""
+        if isinstance(expr, str):
+            expr = self.parse_expression(expr)
+        return sp.factor(expr)
+    
+    def substitute(self, expr: Union[str, sp.Expr], substitutions: Dict[str, Any]) -> sp.Expr:
+        """substitute variables in the expression."""
+        if isinstance(expr, str):
+            expr = self.parse_expression(expr)
+        subs_dict = {sp.Symbol(k): v for k, v in substitutions.items()}
+        return expr.subs(subs_dict)
+    
+    def solve(self, equation: Union[str, sp.Expr], variable: str = None) -> list:
+        """ solve an equation to find waht value makes it true"""
+        if isinstance(equation, str):
+            if '=' in equation:
+                # split into left and right
+                lhs, rhs = equation.split('=')
+                lhs_expr = self.parse_expression(lhs.strip())
+                rhs_expr = self.parse_expression(rhs.strip())
+                equation = sp.Eq(lhs_expr, rhs_expr)
+            else:
+                equation = self.parse_expression(equation)
+                
+            if variable:
+                var = sp.Symbol(variable)
+            else:
+                free_symbols = equation.free_symbols
+                if len(free_symbols) == 1:
+                    var = list(free_symbols)[0]
+                elif len(free_symbols) == 0:
+                    raise ValueError("No variables found in equation")
+                else:
+                    raise ValueError(f"Multiple variables found: {free_symbols}. Please specify which one to solve for.")
+                
+                return sp.solve(equation, var)
+            
+    def assign_variable(self, name: str, expr: Union[str, sp.Expr]) -> sp.Expr:
+        """assign a variable to an expression."""
+        if isinstance(expr, str):
+            expr = self.parse_expression(expr)
+        self.variables[name] = expr
+        return expr
+    
+    def get_variable(self, name: str) -> sp.Expr:
+        """get the value of a variable."""
+        if name not in self.variables:
+            raise KeyError(f"Variable '{name}' is not defined.")
+        return self.variables[name]
+    
+    def list_variables(self) -> Dict[str, sp.Expr]:
+        
+        return self.variables.copy()

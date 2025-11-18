@@ -1,15 +1,19 @@
-# global styles for the app
+"""
+Centralized styles and themes for the SLYEST calculator.
+Contains color schemes, fonts, and stylesheet definitions.
+"""
 
+# Color palette for dark theme (inspired by Apple's calculator)
 COLORS = {
     # Background colors
-    'main_bg': '#1C1C1E',  
-    'display_bg': '#2C2C2E', 
+    'main_bg': '#1C1C1E',  # Very dark gray - main window background
+    'display_bg': '#2C2C2E',  # Dark gray - display area background
 
     # Button colors
-    'number_btn': '#505050', 
-    'operation_btn': '#FF9F0A',  
-    'scientific_btn': '#3A3A3C',  
-    'special_btn': '#A5A5A5',  
+    'number_btn': '#505050',  # Medium gray - number buttons
+    'operation_btn': '#FF9F0A',  # Orange - operation buttons (+, -, ×, ÷, =)
+    'scientific_btn': '#3A3A3C',  # Dark gray - scientific function buttons
+    'special_btn': '#A5A5A5',  # Light gray - special buttons (AC, %)
 
     # Text colors
     'text_white': '#FFFFFF',
@@ -17,7 +21,7 @@ COLORS = {
     'text_gray': '#A0A0A0',
 }
 
-
+# Global application stylesheet
 CALCULATOR_STYLESHEET = f"""
     /* Main window background */
     QMainWindow {{
@@ -36,19 +40,38 @@ CALCULATOR_STYLESHEET = f"""
         color: {COLORS['text_white']};
         border-radius: 10px;
         padding: 20px;
-        font-size: 48pt;
+        font-size: 40pt;
         font-weight: bold;
         qproperty-alignment: 'AlignRight | AlignVCenter';
     }}
 
-    /* Subdisplay label (for showing the expression being typed) */
-    QLabel#subdisplay {{
+    /* Expression input field (for typing algebraic expressions) */
+    QLineEdit#expressionInput {{
         background-color: {COLORS['display_bg']};
-        color: {COLORS['text_gray']};
-        border-radius: 5px;
-        padding: 10px 20px;
-        font-size: 18pt;
-        qproperty-alignment: 'AlignRight | AlignVCenter';
+        color: {COLORS['text_white']};
+        border: 2px solid {COLORS['scientific_btn']};
+        border-radius: 8px;
+        padding: 8px 15px;
+        font-size: 14pt;
+        font-family: 'Courier';
+    }}
+
+    QLineEdit#expressionInput:focus {{
+        border: 2px solid {COLORS['operation_btn']};
+    }}
+
+    QLineEdit#optionalExpressionInput {{
+        background-color: {COLORS['display_bg']};
+        color: {COLORS['text_white']};
+        border: 2px solid {COLORS['scientific_btn']};
+        border-radius: 8px;
+        padding: 8px 15px;
+        font-size: 14pt;
+        font-family: 'Courier';
+    }}
+
+    QLineEdit#optionalExpressionInput:focus {{
+        border: 2px solid {COLORS['operation_btn']};
     }}
 
     /* Variable bar at top */
@@ -133,13 +156,38 @@ CALCULATOR_STYLESHEET = f"""
         background-color: {COLORS['scientific_btn']};
         color: {COLORS['text_white']};
     }}
+
+    /* Symbolic operation buttons (simplify, expand, factor, etc) */
+    QPushButton#symbolicBtn {{
+        background-color: {COLORS['operation_btn']};
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 6px 10px;
+        font-size: 11pt;
+        font-weight: bold;
+        min-width: 70px;
+    }}
+
+    QPushButton#symbolicBtn:hover {{
+        background-color: #E68A00;
+    }}
+
+    QPushButton#symbolicBtn:pressed {{
+        background-color: #CC7A00;
+    }}
 """
 
-def get_calculator_stylesheet():
-    """Returns the global stylesheet for the calculator app."""
+
+def get_calculator_stylesheet() -> str:
+    """
+    Get the main calculator stylesheet.
+    """
     return CALCULATOR_STYLESHEET
 
 
-def get_dark_theme_colors():
-    """returns the color scheme for the dark theme."""
-    return COLORS
+def get_dark_theme() -> dict:
+    """
+    Get the dark theme color dictionary.
+    """
+    return COLORS.copy()
