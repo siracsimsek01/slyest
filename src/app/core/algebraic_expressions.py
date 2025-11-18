@@ -26,9 +26,9 @@ class AlgebraicExpressions:
                 answer = solve(equation, symbol)
                 return answer
             except:
-                print('Error in input equation. Please try again.')
+               return 'Error in input equation'
         else:
-            print('Error in input equation. Please try again.')
+            return 'Error in input equation'
 
 if __name__ == '__main__':
     algebraic_exp = AlgebraicExpressions()

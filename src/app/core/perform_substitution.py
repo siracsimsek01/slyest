@@ -1,38 +1,28 @@
 import sympy
 from sympy.parsing.sympy_parser import parse_expr
 
-def perform_substitution(expression_str, substitutions_dict):
-    
-    if not isinstance(expression_str, str) or not expression_str.strip():
-        return ("Error: No expression provided.", False)
-    
-    if not isinstance(substitutions_dict, dict):
-        return ("Error: Invalid substitution format.", False)
+class Substitution:
+    def __init__(self):
+        pass
 
-    try:
-        
-        expr = parse_expr(expression_str)
-
-        sym_subs = {}
-        for var_name, sub_value in substitutions_dict.items():
-            
-            if not str(var_name).isidentifier():
-                return (f"Error: Invalid variable name '{var_name}'.", False)
-            
-            sub_value_str = str(sub_value)
-            
-         
-            sub_value_sym = parse_expr(sub_value_str)
-
-            var_symbol = sympy.symbols(var_name)
-            
-            sym_subs[var_symbol] = sub_value_sym
-
-        new_expr = expr.subs(sym_subs)
-
-        return (str(new_expr), True)
-
-    except (sympy.SympifyError, TypeError, SyntaxError):
-        return ("Error: Invalid mathematical expression.", False)
-    except Exception as e:
-        return (f"Error: An unexpected error occurred: {e}", False)
+    def perform_substitution(self, expression_str, substitutions_dict):
+        if not isinstance(expression_str, str) or not expression_str.strip():
+            return "No expression provided."
+        if not isinstance(substitutions_dict, dict):
+            return "Invalid substitution format"
+        try:
+            expression = parse_expr(expression_str)
+            substitution_dict = {}
+            for variable_name, substitution_value in substitutions_dict.items():
+                if not str(variable_name).isidentifier():
+                    return "Invalid substitution symbol"
+                substitution_value = str(substitution_value)
+                substitution_value = parse_expr(substitution_value)
+                variable_symbol = sympy.symbols(variable_name)
+                substitution_dict[variable_symbol] = substitution_value
+            result = expression.subs(substitution_dict)
+            return str(result)
+        except (sympy.SympifyError, TypeError, SyntaxError):
+            return "Invalid mathematical expression"
+        except Exception as e:
+            return "An expected error occured."

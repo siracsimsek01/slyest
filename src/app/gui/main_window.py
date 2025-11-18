@@ -10,7 +10,7 @@ from ..gui.styles import get_calculator_stylesheet
 from ..gui.variable_window import VariableWindow
 from ..gui.history_panel import HistoryPanel
 from ..gui.calculator_operations import CalculatorOperations
-from src.app.core.perform_substitution import perform_substitution
+from src.app.core.perform_substitution import Substitution
 from src.app.core.algebraic_expressions import AlgebraicExpressions
 from src.app.core.two_linear_equations import TwoLinearEquations
 
@@ -24,6 +24,7 @@ class MainWindow(QMainWindow):
 
         # create the calculation engine
         self.engine = SymbolicEngine()
+        self.substitution = Substitution()
         self.equation_solver = AlgebraicExpressions()
         self.two_equations_solver = TwoLinearEquations()
 
@@ -620,7 +621,7 @@ class MainWindow(QMainWindow):
                 result = str(self.equation_solver.solve_algerbraic_equation(expression_string))
             elif operation == 'substitute':
                 substituted_values = self.get_substituted_values(optional_expression_string)
-                result, success = perform_substitution(expression_string, substituted_values)
+                result = str(self.substitution.perform_substitution(expression_string, substituted_values))
             elif operation == 'solve 2 equations':
                 result = str(self.two_equations_solver.solve_two_linear_equations(expression_string, optional_expression_string))
             self.display.setText(result)

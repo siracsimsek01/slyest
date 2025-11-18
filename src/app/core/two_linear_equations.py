@@ -40,11 +40,9 @@ class TwoLinearEquations:
                 answer = solve((equ_1, equ_2), (symbols[0], symbols[1]))
                 return answer
             except Exception as e:
-                print('Error in input equation. Please try again.')
-                return None
+                return 'Error in input equations - 2'
         else:
-            print('Error in input equation. Please try again.')
-            return None
+            return 'Error in input equations - 1'
         
 if __name__ == '__main__':
     two_linear_equation_solver = TwoLinearEquations()
