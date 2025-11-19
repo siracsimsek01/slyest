@@ -11,43 +11,38 @@ class CalculatorOperations:
         self.angle_mode = "rad"  # or "deg"
 
     # number input
-    def input_number(self, digit: str) -> str:
+    def input_number(self, digit, current) -> str:
         """handle number button clicks (0-9)
         just append digit to current expression
         """
-        if self.current_expression == "0" or self.current_expression == "":
-            self.current_expression = digit
+        if current == "0" or current == "":
+            current = digit
         else:
-            self.current_expression += digit
-        return self.current_expression
+            current += digit
+        return current
 
-    def input_decimal(self) -> str:
+    def input_decimal(self, current) -> str:
         """decimal point button"""
-        self.current_expression += "."
-        return self.current_expression
+        current += "."
+        return current
         
 
     # basic operations
-    def operation_add(self) -> str:
-        """+ button"""
-        self.current_expression += " + "
-        return self.current_expression
+    def operation(self, selected_operation, current) -> str:
+        operation_buttons = {
+            "add": " + ",
+            "subtract": " - ",
+            "multiply": " * ",
+            "divide": " ÷ ",
+            "equal": " = "
+        }
+        current += operation_buttons[selected_operation]
+        return current
 
-    def operation_subtract(self) -> str:
-        """- button"""
-        # TODO
-        pass
-
-    def operation_multiply(self) -> str:
-        """× button"""
-        # TODO: append " × " (we convert to * later before calc)
-        pass
-
-    def operation_divide(self) -> str:
-        """÷ button"""
-        # TODO: append " ÷ " (convert to / before calc)
-        pass
-
+    def symbols(self, symbol, current):
+        current += symbol
+        return current
+    
     # equals and clear
     def calculate_result(self) -> tuple[str, str]:
         """= button - most important one
@@ -80,24 +75,11 @@ class CalculatorOperations:
     def clear_all(self) -> str:
         """AC button - reset everything"""
         self.current_expression = ""
-        self.last_result = "0"
-        return "0"
+        self.last_result = ""
+        return ""
 
-    def clear_entry(self) -> str:
-        """C button - clear current number only"""
-        # TODO: this one's tricky, maybe later
-        pass
-
-    def backspace(self) -> str:
-        """delete last char"""
-        # TODO
-        pass
-
-    # special operations
-    def plus_minus(self) -> str:
-        """± button - toggle sign"""
-        # TODO: flip sign of current number
-        pass
+    def backspace(self, current) -> str:
+        return current[:-1]
 
     def percentage(self) -> str:
         """% button"""
@@ -105,20 +87,14 @@ class CalculatorOperations:
         pass
 
     # powers and roots
-    def square(self) -> str:
-        """x² button"""
-        # TODO: add "**2" or wrap in parentheses
-        pass
+    def square(self, current) -> str:
+        return current + "**2 "
 
-    def cube(self) -> str:
-        """x³ button"""
-        # TODO
-        pass
+    def cube(self, current) -> str:
+        return current + "**3 "
 
-    def power(self) -> str:
-        """xʸ button - general power"""
-        # TODO: append "**" then wait for next input
-        pass
+    def power(self, current) -> str:
+        return current + "**"
 
     def square_root(self) -> str:
         """√ button"""
@@ -208,21 +184,13 @@ class CalculatorOperations:
         # TODO: use random.random()
         pass
 
-    def scientific_notation(self) -> str:
-        """EE button - scientific notation like 1.5e8"""
-        # TODO
-        pass
 
     # parentheses
-    def open_parenthesis(self) -> str:
-        """( button"""
-        # TODO: append "("
-        pass
+    def open_parenthesis(self, current) -> str:
+        return current + "("
 
-    def close_parenthesis(self) -> str:
-        """) button"""
-        # TODO: append ")" if we have matching (
-        pass
+    def close_parenthesis(self, current) -> str:
+        return current + ")"
 
     # memory functions
     def memory_clear(self) -> str:
@@ -245,11 +213,6 @@ class CalculatorOperations:
         # TODO: insert memory value
         pass
 
-    # mode switching
-    def toggle_angle_mode(self) -> str:
-        """Rad button - toggle rad/deg"""
-        # TODO: flip between "rad" and "deg"
-        pass
 
     def toggle_second_function(self) -> str:
         """2nd button - for inverse functions"""
