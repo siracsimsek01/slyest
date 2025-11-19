@@ -686,8 +686,10 @@ class MainWindow(QMainWindow):
             if not expression_string:
                 return
             
-            expression_string = self.variable_manager.replace_variables(expression_string)
-            optional_expression_string = self.variable_manager.replace_variables(optional_expression_string)
+            expression_string = self.engine.replace_variables(expression_string, operation)
+
+            if optional_expression_string:
+                optional_expression_string = self.engine.replace_variables(optional_expression_string, operation)
 
             if operation == "simplify":
                 result = str(self.engine.simplify(expression_string))

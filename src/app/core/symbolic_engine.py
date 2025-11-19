@@ -88,3 +88,12 @@ class SymbolicEngine:
     def list_variables(self) -> Dict[str, sp.Expr]:
         
         return self.variables.copy()
+    
+    def replace_variables(self, expression, action):
+        if len (expression.split(",")) == 2:
+            return expression
+        for name, value in self.variables.items():
+            expression = expression.replace(name, f"({value})")
+        if action in ["expand", "simplify", "factor"]:
+            return sp.sympify(expression, locals=self.variables)
+        return expression
