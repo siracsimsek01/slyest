@@ -18,6 +18,12 @@ class VariableManager:
             self.variables[name] = sympify(new_expression)
             return True
         return False  
+    
+    def replace_variables(self, expression):
+        for name, value in self.variables.items():
+            expression = expression.replace(name, f"({value})")
+        return sympify(expression, locals=self.variables)
+
 
 if __name__ == '__main__':
     variable_manager = VariableManager()
