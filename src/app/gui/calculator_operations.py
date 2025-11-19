@@ -1,5 +1,6 @@
 from ..core.symbolic_engine import SymbolicEngine
 
+import random
 class CalculatorOperations:
     """handles all button click operations"""
 
@@ -44,19 +45,19 @@ class CalculatorOperations:
         return current
     
     # equals and clear
-    def calculate_result(self) -> tuple[str, str]:
+    def calculate_result(self, inputs) -> tuple[str, str]:
         """= button - most important one
         returns (expression, result)
         """
         try:
-            if not self.current_expression or self.current_expression == "":
+            if not inputs or inputs == "":
                 return None
 
             
-            original_expression = self.current_expression
+            original_expression = inputs
 
             # Replace calculator symbols with Python/SymPy compatible ones
-            calc_expression = self.current_expression.replace("×", "*")
+            calc_expression = inputs.replace("×", "*")
             calc_expression = calc_expression.replace("÷", "/")
             calc_expression = calc_expression.replace("−", "-")
 
@@ -66,7 +67,6 @@ class CalculatorOperations:
 
       
             self.last_result = result_str
-            self.current_expression = ""
 
             return (original_expression, result_str)
         except Exception:
@@ -81,12 +81,9 @@ class CalculatorOperations:
     def backspace(self, current) -> str:
         return current[:-1]
 
-    def percentage(self) -> str:
-        """% button"""
-        # TODO: divide by 100
-        pass
+    def percentage(self, current) -> str:
+        return current + "/100"
 
-    # powers and roots
     def square(self, current) -> str:
         return current + "**2 "
 
@@ -96,125 +93,88 @@ class CalculatorOperations:
     def power(self, current) -> str:
         return current + "**"
 
-    def square_root(self) -> str:
-        """√ button"""
-        # TODO: use sqrt() from sympy
-        pass
+    def square_root(self, current) -> str:
+        return current + "**(1/2)"
+    
+    def cube_root(self, current) -> str:
+        return current + "**(1/3)"
 
-    def cube_root(self) -> str:
-        """³√ button"""
-        # TODO
-        pass
+    def reciprocal(self, current) -> str:
+        return "1/(" + current + ")"
 
-    def reciprocal(self) -> str:
-        """1/x button"""
-        # TODO: 1/current_number
-        pass
-
-    # exponentials and logs
-    def exp(self) -> str:
+  
+    def exp(self, current) -> str:
         """eˣ button"""
-        # TODO: use exp() from sympy
-        pass
+        return "exp(" + current + ")"
 
-    def power_of_10(self) -> str:
-        """10ˣ button"""
-        # TODO
-        pass
+    def power_of_10(self, current) -> str:
+        return "10**(" + current + ")"
 
-    def natural_log(self) -> str:
-        """ln button"""
-        # TODO: use log() from sympy
-        pass
+    def natural_log(self, current) -> str:
+        return "log(" + current + ")"
 
-    def log_base_10(self) -> str:
-        """log₁₀ button"""
-        # TODO
-        pass
+    def log_base_10(self, current) -> str:
+        return "log(" + current + ", 10)"
 
-    # trig functions
-    def sin(self) -> str:
-        """sin button - check angle_mode (rad/deg)"""
-        # TODO: convert to radians if in deg mode
-        pass
 
-    def cos(self) -> str:
-        """cos button"""
-        # TODO
-        pass
+    def sin(self, current) -> str:
+    
+        return current + "sin("
 
-    def tan(self) -> str:
-        """tan button"""
-        # TODO
-        pass
+    def cos(self, current) -> str:
 
-    def sinh(self) -> str:
-        """sinh button - hyperbolic"""
-        # TODO
-        pass
+        return current + "cos("
 
-    def cosh(self) -> str:
-        """cosh button"""
-        # TODO
-        pass
+    def tan(self, current) -> str:
+        return current + "tan("
 
-    def tanh(self) -> str:
-        """tanh button"""
-        # TODO
-        pass
+    def sinh(self, current) -> str:
+        return current + "sinh("
 
-    # special functions
-    def factorial(self) -> str:
-        """x! button"""
-        # TODO: use factorial() from sympy
-        pass
+    def cosh(self, current) -> str:
+        return current + "cosh("
 
-    def insert_constant_e(self) -> str:
-        """e button - euler's number"""
-        # TODO: append "e" to expression
-        pass
+    def tanh(self, current) -> str:
+        return current + "tanh("
 
-    def insert_constant_pi(self) -> str:
-        """π button"""
-        # TODO: append "pi"
-        pass
+   
+    def factorial(self, current) -> str:
+        return current + "!"
+
+    def insert_constant_e(self, current) -> str:
+        return current + "e"
+
+    def insert_constant_pi(self, current) -> str:
+        value = "22/7"
+        return current + value
 
     def random_number(self) -> str:
-        """Rand button"""
-        # TODO: use random.random()
-        pass
+        return str(random.random())
 
 
-    # parentheses
     def open_parenthesis(self, current) -> str:
         return current + "("
 
     def close_parenthesis(self, current) -> str:
         return current + ")"
 
-    # memory functions
+  
     def memory_clear(self) -> str:
-        """mc button"""
-        # TODO: set self.memory = "0"
-        pass
+        self.memory = 0
+        return "0"
 
-    def memory_add(self) -> str:
-        """m+ button"""
-        # TODO: add current to memory
-        pass
+    def memory_add(self, current) -> str:
+        self.memory += float(current)
+        return str(self.memory)
 
-    def memory_subtract(self) -> str:
-        """m- button"""
-        # TODO: subtract current from memory
-        pass
+    def memory_subtract(self, current) -> str:
+        self.memory -= float(current)
+        return str(self.memory)
 
     def memory_recall(self) -> str:
-        """mr button"""
-        # TODO: insert memory value
-        pass
-
+        return str(self.memory)
 
     def toggle_second_function(self) -> str:
         """2nd button - for inverse functions"""
-        # TODO: this is advanced, skip for now
-        pass
+       
+        return "Second function is not is not implemented"

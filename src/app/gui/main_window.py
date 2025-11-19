@@ -530,7 +530,8 @@ class MainWindow(QMainWindow):
 
     def handle_equals_click(self):
         """= button - calculate and show result"""
-        result = self.operations.calculate_result()
+        current_text = self.expression_input.text()
+        result = self.operations.calculate_result(current_text)
         if result is not None:
             expression, answer = result
             self.expression_input.setText(expression)
@@ -549,21 +550,21 @@ class MainWindow(QMainWindow):
         current = self.expression_input.text()
         result = None
         if function_name == "sin":
-            result = self.operations.sin()
+            result = self.operations.sin(current)
         elif function_name == "cos":
-            result = self.operations.cos()
+            result = self.operations.cos(current)
         elif function_name == "tan":
-            result = self.operations.tan()
+            result = self.operations.tan(current)
         elif function_name == "sinh":
-            result = self.operations.sinh()
+            result = self.operations.sinh(current)
         elif function_name == "cosh":
-            result = self.operations.cosh()
+            result = self.operations.cosh(current)
         elif function_name == "tanh":
-            result = self.operations.tanh()
+            result = self.operations.tanh(current)
         elif function_name == "sqrt":
-            result = self.operations.square_root()
+            result = self.operations.square_root(current)
         elif function_name == "cbrt":
-            result = self.operations.cube_root()
+            result = self.operations.cube_root(current)
         elif function_name == "x²":
             result = self.operations.square(current)
         elif function_name == "x³":
@@ -571,17 +572,19 @@ class MainWindow(QMainWindow):
         elif function_name == "xʸ":
             result = self.operations.power(current)
         elif function_name == "1/x":
-            result = self.operations.reciprocal()
+            result = self.operations.reciprocal(current)
         elif function_name == "eˣ":
-            result = self.operations.exp()
+            result = self.operations.exp(current)
+        elif function_name == "pi":
+            result = self.operations.pi(current)
         elif function_name == "10ˣ":
-            result = self.operations.power_of_10()
+            result = self.operations.power_of_10(current)
         elif function_name == "ln":
-            result = self.operations.natural_log()
+            result = self.operations.natural_log(current)
         elif function_name == "log₁₀":
-            result = self.operations.log_base_10()
+            result = self.operations.log_base_10(current)
         elif function_name == "x!":
-            result = self.operations.factorial()
+            result = self.operations.factorial(current)
         elif function_name == "=":
             result = self.operations.operation("equal", current)
 
@@ -627,6 +630,7 @@ class MainWindow(QMainWindow):
                 self.expression_input.setText(result)
 
     def handle_constant_click(self, constant: str):
+        current = self.expression_input.text()
         """constant buttons like e and π"""
         # Check which input field has focus
         if self.optional_expression_input.hasFocus():
@@ -639,9 +643,9 @@ class MainWindow(QMainWindow):
         else:
             # For main input, use operations handler
             if constant == "e":
-                result = self.operations.insert_constant_e()
+                result = self.operations.insert_constant_e(current)
             elif constant == "π":
-                result = self.operations.insert_constant_pi()
+                result = self.operations.insert_constant_pi(current)
 
             if result is not None:
                 self.expression_input.setText(result)
