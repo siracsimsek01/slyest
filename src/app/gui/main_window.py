@@ -230,7 +230,7 @@ class MainWindow(QMainWindow):
 
         # row 1: powers and exponentials
         row1 = [
-            ("2ⁿᵈ", "scientific"),
+            ("=", "scientific"),
             ("x²", "scientific"),
             ("x³", "scientific"),
             ("xʸ", "scientific"),
@@ -239,10 +239,7 @@ class MainWindow(QMainWindow):
         ]
         for col, (text, btn_type) in enumerate(row1):
             btn = CalculatorButton(text, btn_type)
-            if text == "2ⁿᵈ":
-                btn.clicked.connect(lambda: self.handle_special_click("2ⁿᵈ"))
-            else:
-                btn.clicked.connect(lambda checked=False, t=text: self.handle_scientific_function_click(t))
+            btn.clicked.connect(lambda checked=False, t=text: self.handle_scientific_function_click(t))
             grid.addWidget(btn, 1, col)
 
         # row 2: roots and logarithms
@@ -292,10 +289,12 @@ class MainWindow(QMainWindow):
             ("tanh", "scientific"),
             ("x", "scientific"),
             ("y", "scientific"),
+            ("x", "scientific"),
+            ("y", "scientific"),
         ]
         for col, (text, btn_type) in enumerate(row4):
             btn = CalculatorButton(text, btn_type)
-            if text in ["Rand", "EE", "Rad"]:
+            if text in ["Rand", "x", "y"]:
                 btn.clicked.connect(lambda checked=False, t=text: self.handle_special_click(t))
             else:
                 btn.clicked.connect(lambda checked=False, t=text: self.handle_scientific_function_click(t))
@@ -311,7 +310,7 @@ class MainWindow(QMainWindow):
         # Row 0: AC, +/-, %, ÷
         row0 = [
             ("AC", "special"),
-            ("±", "special"),
+            ("←", "special"),
             ("%", "special"),
             ("÷", "operation"),
         ]
@@ -320,7 +319,7 @@ class MainWindow(QMainWindow):
             # connect buttons
             if text == "AC":
                 btn.clicked.connect(self.handle_clear_click)
-            elif text in ["±", "%"]:
+            elif text in ["←", "%"]:
                 btn.clicked.connect(lambda checked=False, t=text: self.handle_special_click(t))
             elif btn_type == "operation":
                 btn.clicked.connect(lambda checked=False, t=text: self.handle_operation_click(t))
@@ -547,6 +546,7 @@ class MainWindow(QMainWindow):
 
     def handle_scientific_function_click(self, function_name: str):
         """scientific functions like sin, cos, etc"""
+        current = self.expression_input.text()
         result = None
         if function_name == "sin":
             result = self.operations.sin()
@@ -565,11 +565,11 @@ class MainWindow(QMainWindow):
         elif function_name == "cbrt":
             result = self.operations.cube_root()
         elif function_name == "x²":
-            result = self.operations.square()
+            result = self.operations.square(current)
         elif function_name == "x³":
-            result = self.operations.cube()
+            result = self.operations.cube(current)
         elif function_name == "xʸ":
-            result = self.operations.power()
+            result = self.operations.power(current)
         elif function_name == "1/x":
             result = self.operations.reciprocal()
         elif function_name == "eˣ":
@@ -582,6 +582,8 @@ class MainWindow(QMainWindow):
             result = self.operations.log_base_10()
         elif function_name == "x!":
             result = self.operations.factorial()
+        elif function_name == "=":
+            result = self.operations.operation("equal", current)
 
         if result is not None:
             self.expression_input.setText(result)
@@ -601,6 +603,7 @@ class MainWindow(QMainWindow):
                 self.current_expression = result
 
     def handle_parenthesis_click(self, paren_type: str):
+        current = self.expression_input.text()
         """parenthesis buttons"""
         # Check which input field has focus
         if self.optional_expression_input.hasFocus():
@@ -655,25 +658,18 @@ class MainWindow(QMainWindow):
 
     def handle_special_click(self, action: str):
         """special buttons - ±, %, Rand, EE, Rad, 2nd"""
+        current = self.expression_input.text()
         result = None
-        if action == "±":
-            result = self.operations.plus_minus()
+        if action == "←":
+            result = self.operations.backspace(current)
         elif action == "%":
             result = self.operations.percentage()
         elif action == "Rand":
             result = self.operations.random_number()
-        elif action == "EE":
-            result = self.operations.scientific_notation()
-        elif action == "Rad":
-            result = self.operations.toggle_angle_mode()
-            # update button text to show current mode
-            if result:
-                for btn in self.findChildren(CalculatorButton):
-                    if btn.text() in ["Rad", "Deg"]:
-                        btn.setText("Deg" if result == "deg" else "Rad")
-            return
-        elif action == "2ⁿᵈ":
-            result = self.operations.toggle_second_function()
+        elif action == "x":
+            result = self.operations.symbols(action, current)
+        elif action == "y":
+            result = self.operations.symbols(action, current)
 
         if result is not None:
             self.expression_input.setText(result)
