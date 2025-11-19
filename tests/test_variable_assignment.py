@@ -1,6 +1,8 @@
 import pytest
 from sympy import symbols
 from src.app.core.variable_assignment import VariableManager  
+from sympy.core.sympify import SympifyError
+
 
 @pytest.fixture
 def variable_manager_and_expression():
@@ -90,5 +92,45 @@ def test_multiple_variables_interaction(variable_manager_and_expression):
     expr_b = variable_manager.get_variable("b")
     result = expr_a * expr_b
     assert result == (x + 1)*(x - 1)
+
+def test_replace_variables_single(variable_manager_and_expression):
+    variable_manager, x = variable_manager_and_expression
+    variable_manager.assign_variable("a", "x + 1")
+    expr = variable_manager.replace_variables("a")
+    assert expr == x + 1
+
+def test_replace_variables_multiple(variable_manager_and_expression):
+    variable_manager, x = variable_manager_and_expression
+    variable_manager.assign_variable("a", "x + 1")
+    variable_manager.assign_variable("b", "x - 1")
+    expr = variable_manager.replace_variables("a * b")
+    assert expr == (x + 1) * (x - 1)
+
+def test_replace_variables_with_update(variable_manager_and_expression):
+    variable_manager, x = variable_manager_and_expression
+    variable_manager.assign_variable("a", "x + 1")
+    variable_manager.replace_variable("a", "x**2")
+    expr = variable_manager.replace_variables("a + 1")
+    assert expr == x**2 + 1
+
+def test_replace_variables_nonexistent(variable_manager_and_expression):
+    variable_manager, x = variable_manager_and_expression
+    expr = variable_manager.replace_variables("z + 1")
+    z = symbols("z")
+    assert expr == z + 1
+
+def test_replace_variables_chain(variable_manager_and_expression):
+    variable_manager, x = variable_manager_and_expression
+    variable_manager.assign_variable("a", "x + 1")
+    variable_manager.assign_variable("b", "a + 2")
+    expr = variable_manager.replace_variables("b")
+    assert expr == x + 3
+
+def test_replace_variables_invalid_expression(variable_manager_and_expression):
+    variable_manager, _ = variable_manager_and_expression
+    variable_manager.assign_variable("a", "x + 1")
+    with pytest.raises(SympifyError):
+        variable_manager.replace_variables("x + * 1")
+
 
 
