@@ -53,16 +53,35 @@ class CalculatorOperations:
         """= button - most important one
         returns (expression, result)
         """
-        # TODO: implement calculation
-        # replace × with *, ÷ with /
-        # use self.engine.parse_expression()
-        # wrap in try/except, return "Error" if fails
-        pass
+        try:
+            if not self.current_expression or self.current_expression == "":
+                return None
+
+            
+            original_expression = self.current_expression
+
+            # Replace calculator symbols with Python/SymPy compatible ones
+            calc_expression = self.current_expression.replace("×", "*")
+            calc_expression = calc_expression.replace("÷", "/")
+            calc_expression = calc_expression.replace("−", "-")
+
+            
+            result = self.engine.parse_expression(calc_expression)
+            result_str = str(result)
+
+      
+            self.last_result = result_str
+            self.current_expression = ""
+
+            return (original_expression, result_str)
+        except Exception:
+            return (self.current_expression, "Error")
 
     def clear_all(self) -> str:
         """AC button - reset everything"""
-        # TODO: set expression to "", result to "0"
-        pass
+        self.current_expression = ""
+        self.last_result = "0"
+        return "0"
 
     def clear_entry(self) -> str:
         """C button - clear current number only"""

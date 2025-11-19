@@ -18,10 +18,14 @@ A Python-based desktop application for symbolic (non-numerical) calculations inc
 - **Equation Solver**: Solve algebraic equations symbolically with clear solution display
 
 ### Additional Features
-- **Session History**: Complete record of past calculations with the ability to scroll back and reuse expressions
-- **Plotting Support**: Graph mathematical expressions using matplotlib integration
-- **Rich PyQt6 GUI**: Modern, accessible user interface designed for users with varying mathematical backgrounds
-- **Export Functionality**: Save session history as text, JSON, or LaTeX format
+- **Session History**: Records up to 20 recent calculations with double-click to reuse expressions
+- **Variable Management**: Store and reuse variables across calculations with an intuitive chip-based display
+- **Dark Theme UI**: Modern PyQt6 interface with a sleek dark theme designed for extended use
+- **Calculator-Style Input**: Dual input modes - symbolic operation buttons and traditional calculator number pad
+
+### Planned Features
+- **Plotting Support**: Graph mathematical expressions using matplotlib integration (in development)
+- **Export Functionality**: Save session history as text, JSON, or LaTeX format (planned)
 
 ## Requirements
 
@@ -116,42 +120,63 @@ python src/app/main.py
 
 ### Plotting
 
+**Note**: Plotting functionality is currently in development. This feature will allow you to:
 1. Enter an expression containing a variable (e.g., `x^2 + 2*x + 1`)
 2. Click the "Plot" button
-3. A new window opens showing the graph
+3. View the graph in a new window
 4. Use the toolbar to zoom, pan, and save the plot
 
 ### Session History
 
-- All operations are automatically recorded in the history panel
-- Double-click any history entry to reuse that expression
-- Export history via File → Export History menu
+1. **Opening the History Panel**: Click the "History ▼" button in the top-right to show/hide the history panel
+2. **Automatic Recording**: All symbolic operations (Simplify, Expand, Factor, Solve, Substitute, Solve 2 Equations) are automatically saved
+3. **Reusing Expressions**: Double-click any history item to load that expression back into the input field
+4. **Clearing History**: Use the "Clear" button in the history panel to remove all entries
+5. **History Limit**: The panel stores the last 20 calculations
+
+**Note**: Export functionality is planned for a future release.
 
 ## Project Structure
 
 ```
-slyest/
+Group_Project/
 ├── src/
 │   └── app/
 │       ├── __init__.py
-│       ├── main.py              # Application entry point
+│       ├── main.py                      # Application entry point
 │       ├── gui/
 │       │   ├── __init__.py
-│       │   ├── main_window.py   # Main PyQt6 window
-│       │   └── widgets.py       # Custom widgets
+│       │   ├── main_window.py           # Main PyQt6 window
+│       │   ├── calculator_buttons.py    # Calculator button widgets
+│       │   ├── calculator_operations.py # Calculator button logic
+│       │   ├── history_panel.py         # History panel widget
+│       │   ├── variable_window.py       # Variable manager window
+│       │   ├── widgets.py               # Reusable UI components
+│       │   └── styles.py                # Dark theme stylesheet
 │       ├── core/
 │       │   ├── __init__.py
-│       │   ├── symbolic_engine.py  # SymPy operations wrapper
-│       │   ├── session.py       # Session history management
-│       │   └── plotter.py       # Plotting functionality
+│       │   ├── symbolic_engine.py       # SymPy operations wrapper
+│       │   ├── algebraic_expressions.py # Equation solver
+│       │   ├── perform_substitution.py  # Substitution operations
+│       │   ├── two_linear_equations.py  # Two equation solver
+│       │   ├── variable_assignment.py   # Variable management
+│       │   ├── parser_validator.py      # Expression parser
+│       │   ├── session.py               # Session history data models
+│       │   └── plotter.py               # Plotting functionality
 │       └── utils/
 │           ├── __init__.py
-│           └── helpers.py       # Utility functions
-├── tests/                       # Unit tests
-│   └── __init__.py
+│           └── helpers.py               # Utility functions
+├── tests/                               # Unit tests
+│   ├── __init__.py
+│   ├── test_algebraic_expressions.py
+│   ├── test_substitution.py
+│   ├── test_two_linear_equations.py
+│   └── test_variable_assignment.py
 ├── .gitignore
-├── pyproject.toml              # Project configuration
-└── README.md                   # This file
+├── requirements.txt                     # Python dependencies
+├── run.sh                               # Launch script
+├── status.md                            # Development status
+└── README.md                            # This file
 ```
 
 ## Development

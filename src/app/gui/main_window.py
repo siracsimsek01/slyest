@@ -429,6 +429,8 @@ class MainWindow(QMainWindow):
         """Insert a variable name into the current expression."""
         self.current_expression += var_name
         self.expression_input.setText(self.current_expression)
+        # Sync with calculator operations
+        self.operations.current_expression = self.current_expression
 
     def toggle_history(self):
         """toggle the history panel visibility."""
@@ -445,6 +447,8 @@ class MainWindow(QMainWindow):
         """Use an expression from history."""
         self.current_expression = expression
         self.expression_input.setText(self.current_expression)
+        # Sync with calculator operations so buttons work with loaded expression
+        self.operations.current_expression = expression
 
     def handle_expression_input(self):
         """when user types expression and presses enter"""
@@ -625,6 +629,14 @@ class MainWindow(QMainWindow):
             elif operation == 'solve 2 equations':
                 result = str(self.two_equations_solver.solve_two_linear_equations(expression_string, optional_expression_string))
             self.display.setText(result)
+
+            # Add to history panel
+            self.history_panel.add_calculation(
+                expression_string,
+                result,
+                operation=operation,
+                optional_expression=optional_expression_string if optional_expression_string else None
+            )
         except:
             return
         
