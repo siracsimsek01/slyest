@@ -290,8 +290,8 @@ class MainWindow(QMainWindow):
             ("sinh", "scientific"),
             ("cosh", "scientific"),
             ("tanh", "scientific"),
-            ("EE", "scientific"),
-            ("Rad", "scientific"),
+            ("x", "scientific"),
+            ("y", "scientific"),
         ]
         for col, (text, btn_type) in enumerate(row4):
             btn = CalculatorButton(text, btn_type)
@@ -427,10 +427,16 @@ class MainWindow(QMainWindow):
 
     def insert_variable(self, var_name: str):
         """Insert a variable name into the current expression."""
-        self.current_expression += var_name
-        self.expression_input.setText(self.current_expression)
-        # Sync with calculator operations
-        self.operations.current_expression = self.current_expression
+        # Check which input field has focus and only update that one
+        if self.optional_expression_input.hasFocus():
+            current_text = self.optional_expression_input.text()
+            self.optional_expression_input.setText(current_text + var_name)
+        else:
+            # Default to main expression input
+            self.current_expression += var_name
+            self.expression_input.setText(self.current_expression)
+            # Sync with calculator operations
+            self.operations.current_expression = self.current_expression
 
     def toggle_history(self):
         """toggle the history panel visibility."""
@@ -443,12 +449,23 @@ class MainWindow(QMainWindow):
         else:
             history_btn.setText("History ▼")
 
-    def use_history_item(self, expression: str):
-        """Use an expression from history."""
+    def use_history_item(self, data: dict):
+        """Use an expression from history. Restores both main and optional expressions."""
+        # Extract expressions from the dictionary
+        expression = data.get('expression', '')
+        optional_expression = data.get('optional_expression', '')
+
+        # Restore main expression
         self.current_expression = expression
         self.expression_input.setText(self.current_expression)
         # Sync with calculator operations so buttons work with loaded expression
         self.operations.current_expression = expression
+
+        # Restore optional expression if it exists
+        if optional_expression:
+            self.optional_expression_input.setText(optional_expression)
+        else:
+            self.optional_expression_input.clear()
 
     def handle_expression_input(self):
         """when user types expression and presses enter"""
@@ -469,23 +486,48 @@ class MainWindow(QMainWindow):
 
     def handle_number_click(self, digit: str):
         """when number buttons (0-9) are clicked"""
-        result = self.operations.input_number(digit)
-        if result is not None:
-            self.expression_input.setText(result)
+        # Check which input field has focus and handle them independently
+        if self.optional_expression_input.hasFocus():
+            # For optional input, append directly without using operations
+            current_text = self.optional_expression_input.text()
+            self.optional_expression_input.setText(current_text + digit)
+        else:
+            # For main input, use operations handler
+            result = self.operations.input_number(digit)
+            if result is not None:
+                self.expression_input.setText(result)
+                self.current_expression = result
+            
+    
 
     def handle_operation_click(self, operation_name: str):
         """when +, -, ×, ÷ buttons clicked"""
-        if operation_name == "+":
-            result = self.operations.operation_add()
-        elif operation_name == "−":
-            result = self.operations.operation_subtract()
-        elif operation_name == "×":
-            result = self.operations.operation_multiply()
-        elif operation_name == "÷":
-            result = self.operations.operation_divide()
+        # Check which input field has focus
+        if self.optional_expression_input.hasFocus():
+            # For optional input, append operator directly
+            current_text = self.optional_expression_input.text()
+            if operation_name == "+":
+                self.optional_expression_input.setText(current_text + " + ")
+            elif operation_name == "−":
+                self.optional_expression_input.setText(current_text + " - ")
+            elif operation_name == "×":
+                self.optional_expression_input.setText(current_text + " * ")
+            elif operation_name == "÷":
+                self.optional_expression_input.setText(current_text + " / ")
+        else:
+            # For main input, use operations handler
+            if operation_name == "+":
+                result = self.operations.operation_add()
+            elif operation_name == "−":
+                result = self.operations.operation_subtract()
+            elif operation_name == "×":
+                result = self.operations.operation_multiply()
+            elif operation_name == "÷":
+                result = self.operations.operation_divide()
 
-        if result is not None:
-            self.expression_input.setText(result)
+            if result is not None:
+                self.expression_input.setText(result)
+                self.current_expression = result
 
     def handle_equals_click(self):
         """= button - calculate and show result"""
@@ -546,29 +588,56 @@ class MainWindow(QMainWindow):
 
     def handle_decimal_click(self):
         """decimal point button"""
-        result = self.operations.input_decimal()
-        if result is not None:
-            self.expression_input.setText(result)
+        # Check which input field has focus
+        if self.optional_expression_input.hasFocus():
+            # For optional input, append decimal directly
+            current_text = self.optional_expression_input.text()
+            self.optional_expression_input.setText(current_text + ".")
+        else:
+            # For main input, use operations handler
+            result = self.operations.input_decimal()
+            if result is not None:
+                self.expression_input.setText(result)
+                self.current_expression = result
 
     def handle_parenthesis_click(self, paren_type: str):
         """parenthesis buttons"""
-        if paren_type == "(":
-            result = self.operations.open_parenthesis()
+        # Check which input field has focus
+        if self.optional_expression_input.hasFocus():
+            # For optional input, append parenthesis directly
+            current_text = self.optional_expression_input.text()
+            self.optional_expression_input.setText(current_text + paren_type)
         else:
-            result = self.operations.close_parenthesis()
+            # For main input, use operations handler
+            if paren_type == "(":
+                result = self.operations.open_parenthesis()
+            else:
+                result = self.operations.close_parenthesis()
 
-        if result is not None:
-            self.expression_input.setText(result)
+            if result is not None:
+                self.expression_input.setText(result)
+                self.current_expression = result
 
     def handle_constant_click(self, constant: str):
         """constant buttons like e and π"""
-        if constant == "e":
-            result = self.operations.insert_constant_e()
-        elif constant == "π":
-            result = self.operations.insert_constant_pi()
+        # Check which input field has focus
+        if self.optional_expression_input.hasFocus():
+            # For optional input, append constant directly
+            current_text = self.optional_expression_input.text()
+            if constant == "e":
+                self.optional_expression_input.setText(current_text + "e")
+            elif constant == "π":
+                self.optional_expression_input.setText(current_text + "pi")
+        else:
+            # For main input, use operations handler
+            if constant == "e":
+                result = self.operations.insert_constant_e()
+            elif constant == "π":
+                result = self.operations.insert_constant_pi()
 
-        if result is not None:
-            self.expression_input.setText(result)
+            if result is not None:
+                self.expression_input.setText(result)
+                self.current_expression = result
 
     def handle_memory_click(self, action: str):
         """memory buttons - mc, m+, m-, mr"""

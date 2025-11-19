@@ -10,7 +10,7 @@ from PyQt6.QtGui import QFont
 
 class HistoryPanel(QWidget):
     ### widget that displays calculation history
-    history_item_selected = pyqtSignal(str)
+    history_item_selected = pyqtSignal(dict)  # Changed to dict to pass both expressions
     
     def __init__(self, parent=None):
         ### create the history panel
@@ -60,24 +60,36 @@ class HistoryPanel(QWidget):
                 item_text = f"{operation}: {expression}, {optional_expression} => {result}"
         else:
             item_text = f"{expression} = {result}"
-        
+
         # create list item
         item = QListWidgetItem(item_text)
-        item.setData(Qt.ItemDataRole.UserRole, expression) # store expression for reuse
-        
-        # add to top of list 
+        # Store both expressions as a dictionary for reuse
+        item.setData(Qt.ItemDataRole.UserRole, {
+            'expression': expression,
+            'optional_expression': optional_expression
+        })
+
+        # add to top of list
         self.history_list.insertItem(0, item)
-        
+
         # limit to last 20 entries
         while self.history_list.count() > 20:
             self.history_list.takeItem(self.history_list.count() - 1)
             
     def on_item_clicked(self, item: QListWidgetItem):
-              # get the stored expression
-        expression = item.data(Qt.ItemDataRole.UserRole)
+        # get the stored expressions (both main and optional)
+        data = item.data(Qt.ItemDataRole.UserRole)
 
-        # emit signal so calculator can use it
-        self.history_item_selected.emit(expression)
+        # For backwards compatibility, handle both dict and string formats
+        if isinstance(data, dict):
+            # New format - emit the dictionary
+            self.history_item_selected.emit(data)
+        else:
+            # Old format - convert string to dict format
+            self.history_item_selected.emit({
+                'expression': data,
+                'optional_expression': None
+            })
 
     def clear_history(self):
         """clear all history items."""
