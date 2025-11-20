@@ -1,31 +1,22 @@
 # SLYEST - Simple System for Symbolic Math
 
-A Python-based desktop application for symbolic (non-numerical) calculations including simplification, expansion, factorization, substitution, and solving equations. Built with PyQt6 and SymPy for an accessible, user-friendly mathematical computing experience.
-
-**CE320 Group Projects 2025 - Group 8**
+A Python-based desktop application for symbolic (non-numerical) calculations including simplification, expansion, factorization, substitution, and solving equations. Built with PyQt6 and SymPy for an accessible and user-friendly mathematical computing experience.
 
 ## Features
 
-### Core Functionality
+### Core Functionalities
+
 - **Expression Input**: Enter algebraic expressions via text-based interface
-- **Symbolic Operations**:
-  - Simplification
-  - Expansion
-  - Factorization
-  - Substitution
-  - Solving algebraic equations
+- **Symbolic Operations**: Perform symbolic operations including simplification, expansion, factorization, substitution and solving simple equations.
 - **Variable Assignment**: Store expressions in variables for reuse (e.g., `e1 := x + 1`)
-- **Equation Solver**: Solve algebraic equations symbolically with clear solution display
+- **Equation Solver**: Solve linear algebraic equations or two linear equations symbolically with clear solutions display
+- **Session History**: Records up to 20 recent calculations with double-click to reuse expressions
 
 ### Additional Features
-- **Session History**: Records up to 20 recent calculations with double-click to reuse expressions
+
 - **Variable Management**: Store and reuse variables across calculations with an intuitive chip-based display
 - **Dark Theme UI**: Modern PyQt6 interface with a sleek dark theme designed for extended use
 - **Calculator-Style Input**: Dual input modes - symbolic operation buttons and traditional calculator number pad
-
-### Planned Features
-- **Plotting Support**: Graph mathematical expressions using matplotlib integration (in development)
-- **Export Functionality**: Save session history as text, JSON, or LaTeX format (planned)
 
 ## Requirements
 
@@ -46,14 +37,12 @@ cd /path/to/Group_Project
 
 ```bash
 # Create virtual environment
-python3 -m venv .venv
+python3 -m venv .venv # On macOS/Linux:
+python -m venv .venv # On Windows
 
 # Activate virtual environment
-# On macOS/Linux:
-source .venv/bin/activate
-
-# On Windows:
-.venv\Scripts\activate
+source .venv/bin/activate # On macOS/Linux:
+.venv\Scripts\activate # On Windows:
 ```
 
 ### 3. Install Dependencies
@@ -75,21 +64,27 @@ pip list | grep -E "sympy|PyQt6|matplotlib"
 
 ## Running the Application
 
-### Option 1: Using the installed command
+### Option 1: Running the bash command
+
+```bash
+bash run.sh
+```
+
+### Option 2: Using the installed command
 
 ```bash
 # Make sure virtual environment is activated
 app
 ```
 
-### Option 2: Using Python module
+### Option 3: Using Python module
 
 ```bash
 # From the project root directory
 python -m app.main
 ```
 
-### Option 3: Direct execution
+### Option 4: Direct execution
 
 ```bash
 # From the project root directory
@@ -100,41 +95,51 @@ python src/app/main.py
 
 ### Basic Operations
 
-1. **Enter an Expression**: Type your mathematical expression in the input field
-   - Examples: `(x^2 + x)/x`, `sin(x)*cos(x)`, `x^2 - 4`
+1. **Enter an symbolic expression**: Type your mathematical expression in the "Type Expression "input field. Click the calculator buttons if required.
 
-2. **Choose an Operation**: Click one of the operation buttons
+   - Examples: `(x**2 + x)/x`, `sin(x)*cos(x)`, `x**2 - 4 = 0`
+
+2. **Enter an optional expression**: Optional expression is only required for substitution and solving two linear algebriac equations.
+
+   - Examples: `x=3, y=5` for substitution, `x - y = 25` for the second linear equation.
+
+3. **Choose an Operation**: Click one of the operation buttons
+
    - **Simplify**: Reduce expression to simplest form
    - **Expand**: Expand products and powers
-   - **Factor**: Factor the expression
-   - **Solve**: Solve equation for unknown variable
+   - **Factor**: Factorize the expression
+   - **Solve**: Solve equation for one unknown variable
+   - **Substitute**: Substitute the algebraic expression with given values
+   - **Solve 2 Equations**: Solve two linear equations for two unknown variables
 
-3. **View Results**: Results appear in the output display area
+4. **View Results**: Results appear in the output display area
 
 ### Variable Assignment
 
-1. Enter and evaluate an expression
-2. Type a variable name in the "Variable name" field (e.g., `e1`)
-3. Click "Assign Last Result"
-4. Use the variable in future expressions
+1. **Assign Variables**
 
-### Plotting
+   - Click Manage Button on the top bar to open the variable manager.
+   - Fill in the name and the expression that needs to be assigned.
+   - Click "Add Variable".
 
-**Note**: Plotting functionality is currently in development. This feature will allow you to:
-1. Enter an expression containing a variable (e.g., `x^2 + 2*x + 1`)
-2. Click the "Plot" button
-3. View the graph in a new window
-4. Use the toolbar to zoom, pan, and save the plot
+2. **Read Variables and its expressions**
+
+   - Assigned variables are displayed in the variable manager.
+   - Moreover, on the top left panel, when hovered the variable, the associated expression is displayed.
+
+3. **Edit and delete variables**
+
+   - Edit and delete the variables in the variable manager window.
+
+4. **Use the variable in future expressions**
+   - Once the variable is assigned, we can use those variables in future calculations and history sessions.
 
 ### Session History
 
-1. **Opening the History Panel**: Click the "History ▼" button in the top-right to show/hide the history panel
-2. **Automatic Recording**: All symbolic operations (Simplify, Expand, Factor, Solve, Substitute, Solve 2 Equations) are automatically saved
-3. **Reusing Expressions**: Double-click any history item to load that expression back into the input field
+1. **Open the History Panel**: Click the "History ▼" button in the top-right to show/hide the history panel
+2. **Automatic Recording**: Up to 20 calculations of all sorts of operations are automatically saved into the history session.
+3. **Reusing Expressions**: Double-click any history item to load that expression back into the input fields
 4. **Clearing History**: Use the "Clear" button in the history panel to remove all entries
-5. **History Limit**: The panel stores the last 20 calculations
-
-**Note**: Export functionality is planned for a future release.
 
 ## Project Structure
 
@@ -156,9 +161,9 @@ Group_Project/
 │       ├── core/
 │       │   ├── __init__.py
 │       │   ├── symbolic_engine.py       # SymPy operations wrapper
-│       │   ├── algebraic_expressions.py # Equation solver
+│       │   ├── algebraic_expressions.py # Linear Equation solver
 │       │   ├── perform_substitution.py  # Substitution operations
-│       │   ├── two_linear_equations.py  # Two equation solver
+│       │   ├── two_linear_equations.py  # Two Linear equations solver
 │       │   ├── variable_assignment.py   # Variable management
 │       │   ├── parser_validator.py      # Expression parser
 │       │   ├── session.py               # Session history data models
@@ -166,13 +171,15 @@ Group_Project/
 │       └── utils/
 │           ├── __init__.py
 │           └── helpers.py               # Utility functions
-├── tests/                               # Unit tests
+├── tests/                               # Unit tests for above individual functions
 │   ├── __init__.py
 │   ├── test_algebraic_expressions.py
+|   ├── test_operators.py
+|   ├── test_parser.py
 │   ├── test_substitution.py
 │   ├── test_two_linear_equations.py
 │   └── test_variable_assignment.py
-├── .gitignore
+├── .gitignore                           # GitIgnore file
 ├── requirements.txt                     # Python dependencies
 ├── run.sh                               # Launch script
 ├── status.md                            # Development status
@@ -210,24 +217,25 @@ flake8 src/
 
 ## Expression Syntax
 
-SLYEST uses SymPy's expression parser. Here are some common syntax patterns:
+Here are some common symbolic syntax patterns:
 
 | Mathematical Notation | SLYEST Input |
-|----------------------|--------------|
-| x² | `x**2` or `x^2` |
-| √x | `sqrt(x)` |
-| sin(x) | `sin(x)` |
-| e^x | `exp(x)` |
-| ln(x) | `log(x)` |
-| π | `pi` |
-| ∞ | `oo` |
-| 2x | `2*x` or `2x` |
+| --------------------- | ------------ |
+| x²                    | `x**2`       |
+| √x                    | `sqrt(x)`    |
+| sin(x)                | `sin(x)`     |
+| e^x                   | `exp(x)`     |
+| ln(x)                 | `log(x)`     |
+| π                     | `pi`         |
+| ∞                     | `oo`         |
+| 2x                    | `2*x`        |
 
 ## Troubleshooting
 
 ### Virtual Environment Issues
 
 If you get "command not found" errors:
+
 ```bash
 # Make sure virtual environment is activated
 source .venv/bin/activate  # macOS/Linux
@@ -237,6 +245,7 @@ source .venv/bin/activate  # macOS/Linux
 ### PyQt6 Installation Issues
 
 On some systems, you may need system dependencies:
+
 ```bash
 # Ubuntu/Debian
 sudo apt-get install python3-pyqt6
@@ -248,6 +257,7 @@ sudo apt-get install python3-pyqt6
 ### Import Errors
 
 If you get import errors, ensure you're in the project directory and the package is installed:
+
 ```bash
 # Install in editable mode
 pip install -e .
@@ -256,26 +266,19 @@ pip install -e .
 ## Future Enhancements
 
 Potential features for future versions:
+
 - Differentiation and Integration (calculus functions)
 - Learning Mode (step-by-step solutions)
 - Custom function definitions
 - Matrix operations
-- 3D plotting support
+- Plotting
 - Keyboard shortcuts for common operations
-
-## License
-
-MIT License - See project documentation for details.
+- Any features requested by the clients
 
 ## Contributors
 
-**Group 8** - CE320 Group Projects 2025
-- Clients: Rahmat and GLAs
+**CE-320 Group-8 Students**
 
 ## Support
 
-For issues, questions, or contributions, please contact the development team or refer to the project documentation.
-
----
-
-Built with ❤️ using Python, PyQt6, and SymPy
+For any issues or questions, please contact the development team or refer to the project documentation.
