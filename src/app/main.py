@@ -5,14 +5,11 @@ from PyQt6.QtGui import QPalette, QColor
 from .gui.main_window import MainWindow
 
 def main():
-    app = QApplication(sys.argv) # create the qt application
-    
-    # Set some basic info about the app
+    app = QApplication(sys.argv)
     app.setApplicationName("SLYEST")
     app.setOrganizationName("Group 8")
     app.setApplicationVersion("0.1.0")
-
-    # create the main window and show it
+    
     window = MainWindow()
     window.show()
 

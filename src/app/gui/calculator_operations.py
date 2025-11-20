@@ -3,19 +3,15 @@ from ..core.symbolic_engine import SymbolicEngine
 import random
 class CalculatorOperations:
     """handles all button click operations"""
-
     def __init__(self, engine: SymbolicEngine):
         self.engine = engine
         self.current_expression = ""
         self.last_result = "0"
-        self.memory = "0"
-        self.angle_mode = "rad"  # or "deg"
+        self.memory = 0
+        self.angle_mode = "rad"
 
     # number input
     def input_number(self, digit, current) -> str:
-        """handle number button clicks (0-9)
-        just append digit to current expression
-        """
         if current == "0" or current == "":
             current = digit
         else:
@@ -23,10 +19,8 @@ class CalculatorOperations:
         return current
 
     def input_decimal(self, current) -> str:
-        """decimal point button"""
         current += "."
         return current
-        
 
     # basic operations
     def operation(self, selected_operation, current) -> str:
@@ -44,36 +38,22 @@ class CalculatorOperations:
         current += symbol
         return current
     
-    # equals and clear
     def calculate_result(self, inputs) -> tuple[str, str]:
-        """= button - most important one
-        returns (expression, result)
-        """
         try:
             if not inputs or inputs == "":
                 return None
-
-            
             original_expression = inputs
-
-            # Replace calculator symbols with Python/SymPy compatible ones
             calc_expression = inputs.replace("×", "*")
             calc_expression = calc_expression.replace("÷", "/")
             calc_expression = calc_expression.replace("−", "-")
-
-            
             result = self.engine.parse_expression(calc_expression)
             result_str = str(result)
-
-      
             self.last_result = result_str
-
             return (original_expression, result_str)
         except Exception:
             return (self.current_expression, "Error")
 
     def clear_all(self) -> str:
-        """AC button - reset everything"""
         self.current_expression = ""
         self.last_result = ""
         return ""
@@ -85,10 +65,10 @@ class CalculatorOperations:
         return current + "/100"
 
     def square(self, current) -> str:
-        return current + "**2 "
+        return current + "**2"
 
     def cube(self, current) -> str:
-        return current + "**3 "
+        return current + "**3"
 
     def power(self, current) -> str:
         return current + "**"
@@ -102,9 +82,7 @@ class CalculatorOperations:
     def reciprocal(self, current) -> str:
         return "1/(" + current + ")"
 
-  
-    def exp(self, current) -> str:
-        """eˣ button"""
+    def exp(self, current) -> str: # eˣ button
         return "exp(" + current + ")"
 
     def power_of_10(self, current) -> str:
@@ -116,13 +94,10 @@ class CalculatorOperations:
     def log_base_10(self, current) -> str:
         return "log(" + current + ", 10)"
 
-
     def sin(self, current) -> str:
-    
         return current + "sin("
 
     def cos(self, current) -> str:
-
         return current + "cos("
 
     def tan(self, current) -> str:
@@ -136,7 +111,6 @@ class CalculatorOperations:
 
     def tanh(self, current) -> str:
         return current + "tanh("
-
    
     def factorial(self, current) -> str:
         return current + "!"
@@ -151,13 +125,11 @@ class CalculatorOperations:
     def random_number(self) -> str:
         return str(random.random())
 
-
     def open_parenthesis(self, current) -> str:
         return current + "("
 
     def close_parenthesis(self, current) -> str:
         return current + ")"
-
   
     def memory_clear(self) -> str:
         self.memory = 0
@@ -173,8 +145,3 @@ class CalculatorOperations:
 
     def memory_recall(self) -> str:
         return str(self.memory)
-
-    def toggle_second_function(self) -> str:
-        """2nd button - for inverse functions"""
-       
-        return "Second function is not is not implemented"

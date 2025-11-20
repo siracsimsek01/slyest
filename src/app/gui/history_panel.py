@@ -13,24 +13,19 @@ class HistoryPanel(QWidget):
     history_item_selected = pyqtSignal(dict)  # Changed to dict to pass both expressions
     
     def __init__(self, parent=None):
-        ### create the history panel
         super().__init__(parent)
         self.setObjectName("historyPanel")
-        self.init_ui()
+        self.initialise_ui()
         
-    def init_ui(self):
-        ### set up the user interface
+    def initialise_ui(self):
         layout = QVBoxLayout(self)
         layout.setSpacing(8)
         layout.setContentsMargins(10, 10, 10, 10)
-        
-        # header with title and clear button
         header_layout = QHBoxLayout()
-        
+
         title = QLabel("History")
         title.setFont(QFont("Arial", 14, QFont.Weight.Bold))
         header_layout.addWidget(title)
-        
         header_layout.addStretch()
         
         # clear button
@@ -38,7 +33,6 @@ class HistoryPanel(QWidget):
         self.clear_btn.setObjectName("historyToggle")
         self.clear_btn.clicked.connect(self.clear_history)
         header_layout.addWidget(self.clear_btn)
-
         layout.addLayout(header_layout)
 
         # history list
@@ -68,33 +62,22 @@ class HistoryPanel(QWidget):
             'expression': expression,
             'optional_expression': optional_expression
         })
-
-        # add to top of list
         self.history_list.insertItem(0, item)
-
-        # limit to last 20 entries
-        while self.history_list.count() > 20:
+        while self.history_list.count() > 20: # limit to last 20 entries
             self.history_list.takeItem(self.history_list.count() - 1)
             
     def on_item_clicked(self, item: QListWidgetItem):
-        # get the stored expressions (both main and optional)
         data = item.data(Qt.ItemDataRole.UserRole)
-
-        # For backwards compatibility, handle both dict and string formats
         if isinstance(data, dict):
-            # New format - emit the dictionary
-            self.history_item_selected.emit(data)
+            self.history_item_selected.emit(data) # New format - emit the dictionary
         else:
-            # Old format - convert string to dict format
-            self.history_item_selected.emit({
+            self.history_item_selected.emit({ # Old format - convert string to dict format
                 'expression': data,
                 'optional_expression': None
             })
 
     def clear_history(self):
-        """clear all history items."""
         self.history_list.clear()
 
     def toggle_visibility(self):
-        """Toggle between showing and hiding the history panel."""
         self.setVisible(not self.isVisible())
