@@ -3,6 +3,7 @@
 from typing import List, Dict, Any, Optional
 from datetime import datetime
 import sympy as sp
+import os
 
 class HistoryEntry:
     
@@ -59,15 +60,20 @@ class SessionManager:
         """Clear all history entries."""
         self.history.clear()
         
-    def export_history(self, format: str = 'text') -> str:
-        
-        if format == 'text':
-            return self._export_text()
-        elif format == 'latex':
-            return self._export_latex()
-        elif format == 'json':
-            return self._export_json()
+    def export_history(self, format, name, calculation_list):
+        if format == 'txt':
+            return self.export_text(name, calculation_list)
+        elif format == 'pdf':
+            return self.export_pdf()
         else:
             raise ValueError(f"Unsupported export format: {format}")
         
-    
+    def export_text(self, name, calculation_list):
+        os.makedirs("HistoryFiles", exist_ok=True)
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"{name}_{timestamp}.txt"
+        filepath = os.path.join("HistoryFiles", filename)
+        with open(filepath, "w", encoding="utf-8") as file:
+            for index, item in enumerate(calculation_list):
+                file.write(str(index + 1) + ". " + item + "\n")
+        return filepath
