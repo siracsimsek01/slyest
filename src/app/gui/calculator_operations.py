@@ -46,7 +46,10 @@ class CalculatorOperations:
             calc_expression = inputs.replace("×", "*")
             calc_expression = calc_expression.replace("÷", "/")
             calc_expression = calc_expression.replace("−", "-")
-            result = self.engine.parse_expression(calc_expression)
+            if "sin" in calc_expression or "cos" in calc_expression or "tan" in calc_expression:
+                result = self.engine.parse_expression(calc_expression).evalf()
+            else:
+                result = self.engine.parse_expression(calc_expression)
             result_str = str(result)
             self.last_result = result_str
             return (original_expression, result_str)
@@ -82,7 +85,7 @@ class CalculatorOperations:
     def reciprocal(self, current) -> str:
         return "1/(" + current + ")"
 
-    def exp(self, current) -> str: # eˣ button
+    def exp(self, current) -> str:
         return "exp(" + current + ")"
 
     def power_of_10(self, current) -> str:
@@ -96,7 +99,7 @@ class CalculatorOperations:
 
     def sin(self, current) -> str:
         return current + "sin("
-
+    
     def cos(self, current) -> str:
         return current + "cos("
 
