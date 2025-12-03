@@ -34,33 +34,28 @@ class HistoryEntry:
 class SessionManager:
     
     def __init__(self, max_history: int = 100):
-        #   Start a new session and get ready to track history with 100 entries
         self.history: List[HistoryEntry] = [] # empty history list to store
         self.max_history = max_history  # Limit how many entries we keep
         self.session_start = datetime.now() # remembers when the session started
         
     def get_history(self, limit: Optional[int] = None) -> List[HistoryEntry]:
-        """Get the calculation history. Can limit how many entries to return."""
         if limit:
             return self.history[-limit:]  # return the last 'limit' entries
         return self.history.copy()
     
     def get_entry(self, index: int) -> HistoryEntry:
-        """Get a specific history entry by its index."""
         return self.history[index]
     
     def get_last_result(self) -> Optional[sp.Expr]:
-        """Get the result of the last calculation, if any."""
         if self.history:
             return self.history[-1].result
         return None
     
     def clear_history(self):
-        """Clear all history entries."""
+        
         self.history.clear()
         
     def export_history(self, format: str = 'text') -> str:
-        
         if format == 'text':
             return self._export_text()
         elif format == 'latex':
