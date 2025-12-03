@@ -36,6 +36,7 @@ class HistoryPanel(QWidget):
         layout.addLayout(header_layout)
 
         # history list
+        self.calculation_history = list()
         self.history_list = QListWidget()
         self.history_list.setObjectName("historyList")
         self.history_list.itemDoubleClicked.connect(self.on_item_clicked)
@@ -55,6 +56,7 @@ class HistoryPanel(QWidget):
         else:
             item_text = f"{expression} = {result}"
 
+        self.calculation_history.append(item_text)
         # create list item
         item = QListWidgetItem(item_text)
         # Store both expressions as a dictionary for reuse
