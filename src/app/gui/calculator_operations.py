@@ -50,7 +50,7 @@ class CalculatorOperations:
                 result = self.engine.parse_expression(calc_expression).evalf()
             else:
                 result = self.engine.parse_expression(calc_expression)
-            result_str = str(result)
+            result_str = str(f"{float(result):.12g}")
             self.last_result = result_str
             return (original_expression, result_str)
         except Exception:
@@ -81,18 +81,21 @@ class CalculatorOperations:
     
     def cube_root(self, current) -> str:
         return current + "**(1/3)"
+    
+    def root(self, current) -> str:
+        return current + "**(1/"
 
     def reciprocal(self, current) -> str:
-        return "1/(" + current + ")"
+        return "1/(" + current + ")" if current else "1/("
 
     def exp(self, current) -> str:
-        return "exp(" + current + ")"
+        return "exp(" + current + ")" if current else "exp("
 
     def power_of_10(self, current) -> str:
-        return "10**(" + current + ")"
+        return "10**(" + current + ")" if current else "10**("
 
     def natural_log(self, current) -> str:
-        return "log(" + current + ")"
+        return "log(" + current + ")" if current else "log("
 
     def log_base_10(self, current) -> str:
         return "log(" + current + ", 10)"

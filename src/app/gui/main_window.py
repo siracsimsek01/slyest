@@ -14,6 +14,7 @@ from src.app.core.perform_substitution import Substitution
 from src.app.core.algebraic_expressions import AlgebraicExpressions
 from src.app.core.two_linear_equations import TwoLinearEquations
 from src.app.core.symbolic_to_decimal import toggle_format
+from sympy import sympify
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -446,6 +447,8 @@ class MainWindow(QMainWindow):
             result = self.operations.square_root(current)
         elif function_name == "cbrt":
             result = self.operations.cube_root(current)
+        elif function_name == "ʸ√x":
+            result = self.operations.root(current)
         elif function_name == "x²":
             result = self.operations.square(current)
         elif function_name == "x³":
@@ -529,6 +532,11 @@ class MainWindow(QMainWindow):
     def handle_memory_click(self, action: str):
         """memory buttons - mc, m+, m-, mr"""
         current = self.display.text()
+        if current == '' or current == 'Error':
+            current = '0'
+        elif '/' in current:
+            decimal_format = sympify(current).evalf()
+            current = str(f"{float(decimal_format):.12g}")
         if action == "mc":
             result = self.operations.memory_clear()
             self.display.setText("")
@@ -612,15 +620,11 @@ class MainWindow(QMainWindow):
     
     def handle_std_click(self):
         
-        current_text = self.expression_input.text()
+        current_text = self.display.text()
 
         result, success = toggle_format(current_text)
         
         if success:
-            
-            self.expression_input.setText(result)
-            
             self.display.setText(result)
         else:
-          
             print(f"Toggle failed: {result}")
