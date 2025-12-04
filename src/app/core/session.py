@@ -63,7 +63,7 @@ class SessionManager:
         if format == 'txt':
             return self.export_text(name, calculation_list)
         elif format == 'pdf':
-            return self.export_pdf()
+            return self.export_pdf(name, calculation_list)
         else:
             raise ValueError(f"Unsupported export format: {format}")
         
