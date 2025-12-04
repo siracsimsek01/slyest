@@ -13,6 +13,7 @@ from ..gui.calculator_operations import CalculatorOperations
 from src.app.core.perform_substitution import Substitution
 from src.app.core.algebraic_expressions import AlgebraicExpressions
 from src.app.core.two_linear_equations import TwoLinearEquations
+from src.app.core.symbolic_to_decimal import toggle_format
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -213,7 +214,7 @@ class MainWindow(QMainWindow):
 
         # Row 4: hyperbolic and special symbols
         row4 = [
-            ("Rand", "scientific"),
+            ("S<=>D", "scientific"),
             ("sinh", "scientific"),
             ("cosh", "scientific"),
             ("tanh", "scientific"),
@@ -222,12 +223,16 @@ class MainWindow(QMainWindow):
         ]
         for col, (text, btn_type) in enumerate(row4):
             btn = CalculatorButton(text, btn_type)
-            if text in ["Rand", "x", "y"]:
+            if text == "S<=>D":
+                
+                btn.clicked.connect(self.handle_std_click)
+            elif text in ["x", "y"]:
+                
                 btn.clicked.connect(lambda checked=False, t=text: self.handle_special_click(t))
             else:
+                
                 btn.clicked.connect(lambda checked=False, t=text: self.handle_scientific_function_click(t))
             grid.addWidget(btn, 4, col)
-
         return grid
 
     def create_number_pad(self) -> QGridLayout:
@@ -604,3 +609,18 @@ class MainWindow(QMainWindow):
         manage_btn.setObjectName(object_name)
         manage_btn.clicked.connect(button_function)
         return manage_btn
+    
+    def handle_std_click(self):
+        
+        current_text = self.expression_input.text()
+
+        result, success = toggle_format(current_text)
+        
+        if success:
+            
+            self.expression_input.setText(result)
+            
+            self.display.setText(result)
+        else:
+          
+            print(f"Toggle failed: {result}")
