@@ -1,0 +1,12 @@
+{
+   "algebraic": [
+    {
+      "name": "quadratic",
+      "pattern": "x**2 + {b}*x + {c}",
+      "description": "Quadratic equation: ax² + bx + c",
+      "category": "algebra",
+      "commonness": 95
+    }
+
+]
+}
