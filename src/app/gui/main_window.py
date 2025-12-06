@@ -1,7 +1,8 @@
 from PyQt6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
-    QLabel, QPushButton, QLineEdit
+    QLabel, QPushButton, QLineEdit, QScrollArea, QSizePolicy
 )
+from PyQt6.QtCore import Qt
 
 from ..core.symbolic_engine import SymbolicEngine
 from ..core.plotter import ExpressionPlotter
@@ -93,6 +94,15 @@ class MainWindow(QMainWindow):
         self.display = QLabel("0")
         self.display.setObjectName("display")
         self.display.setMinimumHeight(100)
+        self.display.setWordWrap(True)
+        self.display.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Ignored)
+        
+        scroll_area = QScrollArea()
+        scroll_area.setWidget(self.display)
+        scroll_area.setFixedHeight(100)
+        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+        
         parent_layout.addWidget(self.display)
 
     def handle_expression_input(self):
