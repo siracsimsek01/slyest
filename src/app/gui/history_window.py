@@ -8,13 +8,11 @@ from src.app.core.session import SessionManager
 
 class HistoryWindow(QDialog):
     """dialog for managing saving history."""
-    # variables_changed = pyqtSignal() # signal emitted when variables are updated
-
     def __init__(self, calculation_history, parent=None):
         self.calculation_history = calculation_history
         super().__init__(parent)
         self.setWindowTitle("History Window")
-        self.setGeometry(200, 200, 500, 300)
+        self.setGeometry(400, 300, 500, 200)
         self.session_manager = SessionManager()
 
         self.setStyleSheet(f"""
@@ -46,7 +44,7 @@ class HistoryWindow(QDialog):
         # name input
         name_layout = QHBoxLayout()
         name_label = QLabel("Enter file name:")
-        name_label.setFixedWidth(80)
+        name_label.setFixedWidth(120)
         self.name_input = QLineEdit()
         self.name_input.setPlaceholderText("e.g., My Calculations")
         name_layout.addWidget(name_label)
@@ -56,20 +54,25 @@ class HistoryWindow(QDialog):
         button_layout = QHBoxLayout()
 
         self.export_text_btn = QPushButton("Export Text File")
-        self.export_text_btn.clicked.connect(self.export_text_file)
+        self.export_text_btn.clicked.connect(lambda: self.export_file('txt'))
         button_layout.addWidget(self.export_text_btn)
 
         self.export_pdf_btn = QPushButton("Export PDF File")
-        self.export_pdf_btn.clicked.connect(self.export_pdf_file)
+        self.export_pdf_btn.clicked.connect(lambda: self.export_file('pdf'))
         button_layout.addWidget(self.export_pdf_btn)
 
         layout.addLayout(button_layout)
 
-    def export_text_file(self):
+    def export_file(self, file_type):
         name = self.name_input.text().strip()
-        self.session_manager.export_history("txt", name, self.calculation_history)
-
-
-    def export_pdf_file(self):
-        name = self.name_input.text().strip()
-        self.session_manager.export_history("pdf", name, self.calculation_history)
+        if name and len(self.calculation_history) != 0:
+            file_name = self.session_manager.export_history(file_type, name, self.calculation_history)
+            if file_name:
+                self.name_input.clear()
+                QMessageBox.information(self, "Info", f"'{file_name}' successfully saved!")
+            else:
+                QMessageBox.critical(self, "Error", "Error in saving text file.")
+        elif not name:
+            QMessageBox.critical(self, "Error", "Please type the file name.")
+        else:
+            QMessageBox.critical(self, "Error", "Calculation history is empty.")
