@@ -7,6 +7,7 @@ from PyQt6.QtWidgets import (
 
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QFont
+from ..gui.history_window import HistoryWindow
 
 class HistoryPanel(QWidget):
     ### widget that displays calculation history
@@ -33,6 +34,13 @@ class HistoryPanel(QWidget):
         self.clear_btn.setObjectName("historyToggle")
         self.clear_btn.clicked.connect(self.clear_history)
         header_layout.addWidget(self.clear_btn)
+        layout.addLayout(header_layout)
+
+        # save button
+        self.save_btn = QPushButton("Save")
+        self.save_btn.setObjectName("historyToggle")
+        self.save_btn.clicked.connect(self.export_history)
+        header_layout.addWidget(self.save_btn)
         layout.addLayout(header_layout)
 
         # history list
@@ -80,6 +88,10 @@ class HistoryPanel(QWidget):
 
     def clear_history(self):
         self.history_list.clear()
+
+    def export_history(self):
+        history_window = HistoryWindow(self.calculation_history)
+        history_window.exec()
 
     def toggle_visibility(self):
         self.setVisible(not self.isVisible())

@@ -4,6 +4,9 @@ from typing import List, Dict, Any, Optional
 from datetime import datetime
 import sympy as sp
 import os
+from reportlab.pdfgen import canvas
+from reportlab.lib import colors
+from reportlab.pdfbase.pdfmetrics import stringWidth
 
 class HistoryEntry:
     
@@ -35,36 +38,32 @@ class HistoryEntry:
 class SessionManager:
     
     def __init__(self, max_history: int = 100):
-        #   Start a new session and get ready to track history with 100 entries
         self.history: List[HistoryEntry] = [] # empty history list to store
         self.max_history = max_history  # Limit how many entries we keep
         self.session_start = datetime.now() # remembers when the session started
         
     def get_history(self, limit: Optional[int] = None) -> List[HistoryEntry]:
-        """Get the calculation history. Can limit how many entries to return."""
         if limit:
             return self.history[-limit:]  # return the last 'limit' entries
         return self.history.copy()
     
     def get_entry(self, index: int) -> HistoryEntry:
-        """Get a specific history entry by its index."""
         return self.history[index]
     
     def get_last_result(self) -> Optional[sp.Expr]:
-        """Get the result of the last calculation, if any."""
         if self.history:
             return self.history[-1].result
         return None
     
     def clear_history(self):
-        """Clear all history entries."""
+        
         self.history.clear()
         
     def export_history(self, format, name, calculation_list):
         if format == 'txt':
             return self.export_text(name, calculation_list)
         elif format == 'pdf':
-            return self.export_pdf()
+            return self.export_pdf(name, calculation_list)
         else:
             raise ValueError(f"Unsupported export format: {format}")
         
@@ -77,3 +76,45 @@ class SessionManager:
             for index, item in enumerate(calculation_list):
                 file.write(str(index + 1) + ". " + item + "\n")
         return filepath
+    
+    def export_pdf(self, name, calculation_list):
+        pdf_file_name = f'{name}.pdf'
+        title = 'Calculation History'
+        max_width = 500
+        font = "Times-Roman"
+        font_size = 12
+
+        pdf = canvas.Canvas(pdf_file_name)
+        pdf.drawCentredString(300, 770, title)
+        pdf.setFillColorRGB(0, 0, 255)
+        pdf.line(30, 750, 550, 750)
+
+        text = pdf.beginText(40, 720)
+        text.setFont(font, font_size)
+        text.setLeading(20)
+        text.setFillColor(colors.black)
+
+        for index, line in enumerate(calculation_list):
+            numbered_line = f"{index + 1}. {line}"
+            wrapped_lines = self.wrap_text(numbered_line, font, font_size, max_width)
+            for wrapped_line in wrapped_lines:
+                text.textLine(wrapped_line)
+            
+        pdf.drawText(text)
+        pdf.save()
+        return pdf_file_name
+    
+    def wrap_text(self, text, font, font_size, max_width):
+        words = text.split()
+        lines = []
+        current = ""
+        for word in words:
+            test = current + (" " if current else "") + word
+            if stringWidth(test, font, font_size) <= max_width:
+                current = test
+            else:
+                lines.append(current)
+                current = word
+        if current:
+            lines.append(current)
+        return lines

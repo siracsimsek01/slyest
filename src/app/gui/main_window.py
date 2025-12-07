@@ -1,7 +1,8 @@
 from PyQt6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
-    QLabel, QPushButton, QLineEdit
+    QLabel, QPushButton, QLineEdit, QScrollArea, QSizePolicy
 )
+from PyQt6.QtCore import Qt
 
 from ..core.symbolic_engine import SymbolicEngine
 from ..core.plotter import ExpressionPlotter
@@ -13,6 +14,8 @@ from ..gui.calculator_operations import CalculatorOperations
 from src.app.core.perform_substitution import Substitution
 from src.app.core.algebraic_expressions import AlgebraicExpressions
 from src.app.core.two_linear_equations import TwoLinearEquations
+from src.app.core.symbolic_to_decimal import toggle_format
+from sympy import sympify
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -91,6 +94,15 @@ class MainWindow(QMainWindow):
         self.display = QLabel("0")
         self.display.setObjectName("display")
         self.display.setMinimumHeight(100)
+        self.display.setWordWrap(True)
+        self.display.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Ignored)
+        
+        scroll_area = QScrollArea()
+        scroll_area.setWidget(self.display)
+        scroll_area.setFixedHeight(100)
+        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+        
         parent_layout.addWidget(self.display)
 
     def handle_expression_input(self):
@@ -213,7 +225,7 @@ class MainWindow(QMainWindow):
 
         # Row 4: hyperbolic and special symbols
         row4 = [
-            ("Rand", "scientific"),
+            ("S<=>D", "scientific"),
             ("sinh", "scientific"),
             ("cosh", "scientific"),
             ("tanh", "scientific"),
@@ -222,12 +234,16 @@ class MainWindow(QMainWindow):
         ]
         for col, (text, btn_type) in enumerate(row4):
             btn = CalculatorButton(text, btn_type)
-            if text in ["Rand", "x", "y"]:
+            if text == "S<=>D":
+                
+                btn.clicked.connect(self.handle_std_click)
+            elif text in ["x", "y"]:
+                
                 btn.clicked.connect(lambda checked=False, t=text: self.handle_special_click(t))
             else:
+                
                 btn.clicked.connect(lambda checked=False, t=text: self.handle_scientific_function_click(t))
             grid.addWidget(btn, 4, col)
-
         return grid
 
     def create_number_pad(self) -> QGridLayout:
@@ -441,6 +457,8 @@ class MainWindow(QMainWindow):
             result = self.operations.square_root(current)
         elif function_name == "cbrt":
             result = self.operations.cube_root(current)
+        elif function_name == "ʸ√x":
+            result = self.operations.root(current)
         elif function_name == "x²":
             result = self.operations.square(current)
         elif function_name == "x³":
@@ -524,6 +542,11 @@ class MainWindow(QMainWindow):
     def handle_memory_click(self, action: str):
         """memory buttons - mc, m+, m-, mr"""
         current = self.display.text()
+        if current == '' or current == 'Error':
+            current = '0'
+        elif '/' in current:
+            decimal_format = sympify(current).evalf()
+            current = str(f"{float(decimal_format):.12g}")
         if action == "mc":
             result = self.operations.memory_clear()
             self.display.setText("")
@@ -604,3 +627,14 @@ class MainWindow(QMainWindow):
         manage_btn.setObjectName(object_name)
         manage_btn.clicked.connect(button_function)
         return manage_btn
+    
+    def handle_std_click(self):
+        
+        current_text = self.display.text()
+
+        result, success = toggle_format(current_text)
+        
+        if success:
+            self.display.setText(result)
+        else:
+            print(f"Toggle failed: {result}")
