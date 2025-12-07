@@ -7,14 +7,19 @@ from PyQt6.QtGui import QFont
 from src.app.core.session import SessionManager
 
 class HistoryWindow(QDialog):
-    """dialog for managing saving history."""
+    """dialog for saving calculation history"""
     def __init__(self, calculation_history, parent=None):
-        self.calculation_history = calculation_history
         super().__init__(parent)
-        self.setWindowTitle("History Window")
-        self.setGeometry(400, 300, 500, 200)
+        self.calculation_history = calculation_history
         self.session_manager = SessionManager()
 
+        self.setWindowTitle("History Window")
+        self.setGeometry(400, 300, 500, 200)
+
+        self.apply_stylesheet()
+        self.initialise_ui()
+        
+    def apply_stylesheet(self):
         self.setStyleSheet(f"""
                 QDialog {{
                     background-color: #1C1C1E;
@@ -36,8 +41,8 @@ class HistoryWindow(QDialog):
             QPushButton:hover {{
                 background-color: #E68A00;
             }}""")
-                    
         
+    def initialise_ui(self):
         layout = QVBoxLayout(self)
         layout.setSpacing(15)
 
@@ -52,7 +57,6 @@ class HistoryWindow(QDialog):
         layout.addLayout(name_layout)
 
         button_layout = QHBoxLayout()
-
         self.export_text_btn = QPushButton("Export Text File")
         self.export_text_btn.clicked.connect(lambda: self.export_file('txt'))
         button_layout.addWidget(self.export_text_btn)
