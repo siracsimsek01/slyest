@@ -124,6 +124,7 @@ class MainWindow(QMainWindow):
         button_layout.addWidget(self.create_new_button("Solve", "symbolicBtn", lambda: self.handle_symbolic_operation('solve'))) # solve
         button_layout.addWidget(self.create_new_button("Substitute", "symbolicBtn", lambda: self.handle_symbolic_operation('substitute'))) # substitute
         button_layout.addWidget(self.create_new_button("Solve 2 Equations", "symbolicBtn", lambda: self.handle_symbolic_operation('solve 2 equations'))) # sovle 2 equations
+        button_layout.addWidget(self.create_new_button("Differentiate", "symbolicBtn", lambda: self.handle_symbolic_operation('differentiate'))) # differentiate
 
         parent_layout.addWidget(button_container)
 
@@ -600,6 +601,8 @@ class MainWindow(QMainWindow):
                 result = str(self.substitution.perform_substitution(expression_string, substituted_values))
             elif operation == 'solve 2 equations':
                 result = str(self.two_equations_solver.solve_two_linear_equations(expression_string, optional_expression_string))
+            elif operation == 'differentiate':
+                result = str(self.engine.differentiate(expression_string, optional_expression_string))
             self.display.setText(result)
 
             # Add to history panel

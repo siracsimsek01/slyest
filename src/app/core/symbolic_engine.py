@@ -6,7 +6,10 @@ Think of it as the brain that does all the symbolic math work.
 from typing import Union, Dict, Any
 import sympy as sp
 from sympy.parsing.sympy_parser import parse_expr, standard_transformations, implicit_multiplication_application
-
+from sympy import Derivative 
+from sympy import diff, sin, exp 
+from sympy.abc import x,y 
+from sympy import Symbol, sympify
 class SymbolicEngine:
     # This is our main calculator class that does all the symbolic math.
     def __init__(self):
@@ -97,3 +100,18 @@ class SymbolicEngine:
         if action in ["expand", "simplify", "factor"]:
             return sp.sympify(expression, locals=self.variables)
         return expression
+    
+    def differentiate(self, expr, optional_expression_input):
+        if not optional_expression_input:
+            var = Symbol(self.find_symbol(expr))
+            return diff(expr, var)
+        elif optional_expression_input.isalpha() and len(optional_expression_input) == 1:
+            var = Symbol(optional_expression_input)
+            return diff(expr, var)
+        else:
+            return "Enter only one variable."
+    
+    def find_symbol(self, expr):
+         for char in expr:
+            if char.isalpha():
+                return char     
