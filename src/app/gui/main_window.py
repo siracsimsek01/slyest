@@ -6,6 +6,7 @@ from PyQt6.QtCore import Qt
 
 from ..core.symbolic_engine import SymbolicEngine
 from ..core.plotter import ExpressionPlotter
+from ..core.math_formatter import MathFormatter
 from ..gui.calculator_buttons import CalculatorButton
 from ..gui.styles import get_calculator_stylesheet
 from ..gui.variable_window import VariableWindow
@@ -33,6 +34,12 @@ class MainWindow(QMainWindow):
         self.current_expression = ""
         self.setStyleSheet(get_calculator_stylesheet())
         self.initialise_ui()
+
+    def _set_formatted_text(self, widget: QLineEdit, text: str):
+        widget.setText(MathFormatter.to_display(text))
+
+    def _get_internal_text(self, widget: QLineEdit) -> str:
+        return MathFormatter.to_internal(widget.text())
 
     def initialise_ui(self):
         central_widget = QWidget()
@@ -137,7 +144,6 @@ class MainWindow(QMainWindow):
         parent_layout.addWidget(self.history_panel)
 
     def create_calculator_buttons(self, parent_layout):
-        """Create the button grid with Apple's two-column layout."""
         button_container = QWidget()
         button_layout = QHBoxLayout(button_container)
         button_layout.setSpacing(15)
@@ -357,11 +363,11 @@ class MainWindow(QMainWindow):
 
     def insert_variable(self, var_name: str):
         if self.optional_expression_input.hasFocus():
-            current_text = self.optional_expression_input.text()
-            self.optional_expression_input.setText(current_text + var_name)
+            current_text = self._get_internal_text(self.optional_expression_input)
+            self._set_formatted_text(self.optional_expression_input, current_text + var_name)
         else:
-            current_text = self.expression_input.text()
-            self.expression_input.setText(current_text + var_name)
+            current_text = self._get_internal_text(self.expression_input)
+            self._set_formatted_text(self.expression_input, current_text + var_name)
 
     def toggle_history(self):
         self.history_panel.toggle_visibility()
@@ -375,39 +381,36 @@ class MainWindow(QMainWindow):
         expression = data.get('expression', '')
         optional_expression = data.get('optional_expression', '')
         self.current_expression = expression
-        self.expression_input.setText(self.current_expression)
+        self._set_formatted_text(self.expression_input, self.current_expression)
         self.operations.current_expression = expression
-        if optional_expression: # Restore optional expression if it exists
-            self.optional_expression_input.setText(optional_expression)
+        if optional_expression:
+            self._set_formatted_text(self.optional_expression_input, optional_expression)
         else:
             self.optional_expression_input.clear()
 
     def handle_number_click(self, digit: str):
-        """when number buttons (0-9) are clicked"""
         if self.optional_expression_input.hasFocus():
-            current_text = self.optional_expression_input.text()
+            current_text = self._get_internal_text(self.optional_expression_input)
             result = self.operations.input_number(digit, current_text)
             if result is not None:
-                self.optional_expression_input.setText(result)
+                self._set_formatted_text(self.optional_expression_input, result)
         else:
-            current_text = self.expression_input.text()
+            current_text = self._get_internal_text(self.expression_input)
             result = self.operations.input_number(digit, current_text)
             if result is not None:
-                self.expression_input.setText(result)
+                self._set_formatted_text(self.expression_input, result)
 
     def handle_operation_click(self, operation_name: str):
-        """when +, -, ×, ÷ buttons clicked"""
         if self.optional_expression_input.hasFocus():
-            current_text = self.optional_expression_input.text()
+            current_text = self._get_internal_text(self.optional_expression_input)
             result = self.choose_operations_based_on_symbols(operation_name, current_text)
             if result is not None:
-                self.optional_expression_input.setText(result)
+                self._set_formatted_text(self.optional_expression_input, result)
         else:
-            # For main input, use operations handler
-            current_text = self.expression_input.text()
+            current_text = self._get_internal_text(self.expression_input)
             result = self.choose_operations_based_on_symbols(operation_name, current_text)
             if result is not None:
-                self.expression_input.setText(result)
+                self._set_formatted_text(self.expression_input, result)
 
     def choose_operations_based_on_symbols(self, operation_name, current):
         if operation_name == "+":
@@ -421,26 +424,27 @@ class MainWindow(QMainWindow):
         return result
 
     def handle_equals_click(self):
-        """= button - calculate and show result"""
-        current_text = self.expression_input.text()
+        current_text = self._get_internal_text(self.expression_input)
         result = self.operations.calculate_result(current_text)
         if result is not None:
             expression, answer = result
-            self.expression_input.setText(expression)
-            self.display.setText(answer)
+            self._set_formatted_text(self.expression_input, expression)
+            self.display.setText(MathFormatter.to_display(answer))
             self.history_panel.add_calculation(expression, answer)
 
     def handle_clear_click(self):
-        """AC button - clear everything"""
         result = self.operations.clear_all()
         if result is not None:
-            self.expression_input.setText(result)
-            self.optional_expression_input.setText(result)
+            self._set_formatted_text(self.expression_input, result)
+            self._set_formatted_text(self.optional_expression_input, result)
             self.display.setText(result)
 
     def handle_scientific_function_click(self, function_name: str):
-        """scientific functions like sin, cos, etc"""
-        current = self.expression_input.text()
+        if self.optional_expression_input.hasFocus():
+            current = self._get_internal_text(self.optional_expression_input)
+        else:
+            current = self._get_internal_text(self.expression_input)
+
         result = None
         if function_name == "sin":
             result = self.operations.sin(current)
@@ -484,33 +488,34 @@ class MainWindow(QMainWindow):
             result = self.operations.operation("equal", current)
 
         if result is not None:
-            self.expression_input.setText(result)
+            if self.optional_expression_input.hasFocus():
+                self._set_formatted_text(self.optional_expression_input, result)
+            else:
+                self._set_formatted_text(self.expression_input, result)
 
     def handle_decimal_click(self):
-        """decimal point button"""
         if self.optional_expression_input.hasFocus():
-            current = self.optional_expression_input.text()
+            current = self._get_internal_text(self.optional_expression_input)
             result = self.operations.input_decimal(current)
             if result is not None:
-                self.optional_expression_input.setText(result)
+                self._set_formatted_text(self.optional_expression_input, result)
         else:
-            current = self.expression_input.text()
+            current = self._get_internal_text(self.expression_input)
             result = self.operations.input_decimal(current)
             if result is not None:
-                self.expression_input.setText(result)
+                self._set_formatted_text(self.expression_input, result)
 
     def handle_parenthesis_click(self, parenthesis_type: str):
-        """parenthesis buttons"""
         if self.optional_expression_input.hasFocus():
-            current_text = self.optional_expression_input.text()
+            current_text = self._get_internal_text(self.optional_expression_input)
             result = self.choose_parenthesis(parenthesis_type, current_text)
             if result is not None:
-                self.optional_expression_input.setText(result)
+                self._set_formatted_text(self.optional_expression_input, result)
         else:
-            current_text = self.expression_input.text()
+            current_text = self._get_internal_text(self.expression_input)
             result = self.choose_parenthesis(parenthesis_type, current_text)
             if result is not None:
-                self.expression_input.setText(result)
+                self._set_formatted_text(self.expression_input, result)
 
     def choose_parenthesis(self, parenthesis_type, current):
         if parenthesis_type == "(":
@@ -520,18 +525,16 @@ class MainWindow(QMainWindow):
         return result
 
     def handle_constant_click(self, constant: str):
-        """constant buttons like e and π"""
         if self.optional_expression_input.hasFocus():
-            # For optional input, append constant directly
-            current = self.optional_expression_input.text()
+            current = self._get_internal_text(self.optional_expression_input)
             result = self.choose_constants(constant, current)
             if result is not None:
-                self.optional_expression_input.setText(result)
+                self._set_formatted_text(self.optional_expression_input, result)
         else:
-            current = self.expression_input.text()
+            current = self._get_internal_text(self.expression_input)
             result = self.choose_constants(constant, current)
             if result is not None:
-                self.expression_input.setText(result)
+                self._set_formatted_text(self.expression_input, result)
 
     def choose_constants(self, constant, current):
         if constant == "e":
@@ -541,7 +544,6 @@ class MainWindow(QMainWindow):
         return result
 
     def handle_memory_click(self, action: str):
-        """memory buttons - mc, m+, m-, mr"""
         current = self.display.text()
         if current == '' or current == 'Error':
             current = '0'
@@ -558,12 +560,11 @@ class MainWindow(QMainWindow):
         elif action == "mr":
             result = self.operations.memory_recall()
             if result is not None:
-                self.expression_input.setText("")
-                self.display.setText(result)
+                self._set_formatted_text(self.expression_input, "")
+                self.display.setText(MathFormatter.to_display(result))
 
     def handle_special_click(self, action: str):
-        """special buttons - ±, %, Rand, EE, Rad, 2nd"""
-        current = self.expression_input.text()
+        current = self._get_internal_text(self.expression_input)
         result = None
         if action == "←":
             result = self.operations.backspace(current)
@@ -576,12 +577,12 @@ class MainWindow(QMainWindow):
         elif action == "y":
             result = self.operations.symbols(action, current)
         if result is not None:
-            self.expression_input.setText(result)
+            self._set_formatted_text(self.expression_input, result)
 
     def handle_symbolic_operation(self, operation: str):
         try:
-            expression_string = self.expression_input.text()
-            optional_expression_string = self.optional_expression_input.text()
+            expression_string = self._get_internal_text(self.expression_input)
+            optional_expression_string = self._get_internal_text(self.optional_expression_input)
             if not expression_string:
                 return
             expression_string = self.engine.replace_variables(expression_string, operation)
@@ -603,14 +604,13 @@ class MainWindow(QMainWindow):
                 result = str(self.two_equations_solver.solve_two_linear_equations(expression_string, optional_expression_string))
             elif operation == 'differentiate':
                 result = str(self.engine.differentiate(expression_string, optional_expression_string))
-            self.display.setText(result)
+            self.display.setText(MathFormatter.to_display(result))
 
-            # Add to history panel
             self.history_panel.add_calculation(
-                self.expression_input.text(),
+                expression_string,
                 result,
                 operation=operation,
-                optional_expression=self.optional_expression_input.text() if optional_expression_string else None
+                optional_expression=optional_expression_string if optional_expression_string else None
             )
         except:
             return

@@ -28,7 +28,7 @@ class CalculatorOperations:
             "add": " + ",
             "subtract": " - ",
             "multiply": " * ",
-            "divide": " ÷ ",
+            "divide": " / ",
             "equal": " = "
         }
         current += operation_buttons[selected_operation]
@@ -78,10 +78,10 @@ class CalculatorOperations:
 
     def square_root(self, current) -> str:
         return current + "**(1/2)"
-    
+
     def cube_root(self, current) -> str:
         return current + "**(1/3)"
-    
+
     def root(self, current) -> str:
         return current + "**(1/"
 
@@ -125,8 +125,7 @@ class CalculatorOperations:
         return current + "e"
 
     def insert_constant_pi(self, current) -> str:
-        value = "22/7"
-        return current + value
+        return current + "pi"
 
     def random_number(self) -> str:
         return str(random.random())
