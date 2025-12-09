@@ -1,12 +1,362 @@
 {
-   "algebraic": [
+  "algebraic": [
     {
       "name": "quadratic",
       "pattern": "x**2 + {b}*x + {c}",
-      "description": "Quadratic equation: ax² + bx + c",
+      "description": "Quadratic equation: ax^2 + bx + c",
       "category": "algebra",
       "commonness": 95
+    },
+    {
+      "name": "linear",
+      "pattern": "{m}*x + {b}",
+      "description": "Linear function: mx + b",
+      "category": "algebra",
+      "commonness": 98
+    },
+    {
+      "name": "binomial_expansion_square",
+      "pattern": "(x + {a})**2",
+      "description": "Square of binomial: (x + a)^2",
+      "category": "algebra",
+      "commonness": 90
+    },
+    {
+      "name": "difference_of_squares",
+      "pattern": "(x + {a})*(x - {a})",
+      "description": "Difference of squares: x^2 - a^2",
+      "category": "algebra",
+      "commonness": 90
+    },
+    {
+      "name": "product_of_binomials",
+      "pattern": "(x + {a})*(x + {b})",
+      "description": "Product of two binomials",
+      "category": "algebra",
+      "commonness": 85
+    },
+    {
+      "name": "rational_function",
+      "pattern": "({a}*x + {b})/({c}*x + {d})",
+      "description": "Simple rational function",
+      "category": "algebra",
+      "commonness": 80
+    },
+    {
+      "name": "cubic",
+      "pattern": "x**3 + {a}*x**2 + {b}*x + {c}",
+      "description": "Cubic polynomial",
+      "category": "algebra",
+      "commonness": 75
+    },
+    {
+      "name": "polynomial_degree_4",
+      "pattern": "x**4 + {a}*x**3 + {b}*x**2 + {c}*x + {d}",
+      "description": "Quartic polynomial",
+      "category": "algebra",
+      "commonness": 60
+    },
+    {
+      "name": "absolute_linear",
+      "pattern": "abs({a}*x + {b})",
+      "description": "Absolute value of linear expression",
+      "category": "algebra",
+      "commonness": 80
+    },
+    {
+      "name": "rational_with_square",
+      "pattern": "({a})/x**2",
+      "description": "Inverse square rational function",
+      "category": "algebra",
+      "commonness": 70
     }
-
-]
+  ],
+  "trigonometric": [
+    {
+      "name": "sine_function",
+      "pattern": "{a}*sin({b}*x + {c})",
+      "description": "General sine function",
+      "category": "trigonometry",
+      "commonness": 95
+    },
+    {
+      "name": "cosine_function",
+      "pattern": "{a}*cos({b}*x + {c})",
+      "description": "General cosine function",
+      "category": "trigonometry",
+      "commonness": 95
+    },
+    {
+      "name": "tangent_function",
+      "pattern": "tan({a}*x + {b})",
+      "description": "General tangent function",
+      "category": "trigonometry",
+      "commonness": 80
+    },
+    {
+      "name": "sin_squared_plus_cos_squared",
+      "pattern": "sin(x)**2 + cos(x)**2",
+      "description": "Identity sin^2(x) + cos^2(x) = 1",
+      "category": "trigonometry",
+      "commonness": 90
+    },
+    {
+      "name": "sine_sum",
+      "pattern": "sin(x) + sin({a}*x)",
+      "description": "Sum of sine functions",
+      "category": "trigonometry",
+      "commonness": 70
+    },
+    {
+      "name": "cosine_sum",
+      "pattern": "cos(x) + cos({a}*x)",
+      "description": "Sum of cosine functions",
+      "category": "trigonometry",
+      "commonness": 70
+    },
+    {
+      "name": "sine_times_cosine",
+      "pattern": "sin(x)*cos(x)",
+      "description": "Product of sine and cosine",
+      "category": "trigonometry",
+      "commonness": 75
+    },
+    {
+      "name": "sine_double_angle",
+      "pattern": "2*sin(x)*cos(x)",
+      "description": "Double-angle identity for sine",
+      "category": "trigonometry",
+      "commonness": 85
+    },
+    {
+      "name": "cosine_double_angle",
+      "pattern": "cos(x)**2 - sin(x)**2",
+      "description": "Double-angle identity for cosine",
+      "category": "trigonometry",
+      "commonness": 85
+    },
+    {
+      "name": "trig_rational",
+      "pattern": "sin(x)/cos(x)",
+      "description": "Tangent as ratio of sine and cosine",
+      "category": "trigonometry",
+      "commonness": 80
+    }
+  ],
+  "exponential_logarithmic": [
+    {
+      "name": "exponential_growth",
+      "pattern": "{a}*exp({b}*x)",
+      "description": "Exponential growth model",
+      "category": "exponential",
+      "commonness": 95
+    },
+    {
+      "name": "exponential_decay",
+      "pattern": "{a}*exp(-{b}*x)",
+      "description": "Exponential decay model",
+      "category": "exponential",
+      "commonness": 95
+    },
+    {
+      "name": "power_law",
+      "pattern": "{a}*x**{b}",
+      "description": "Power law relation",
+      "category": "exponential",
+      "commonness": 85
+    },
+    {
+      "name": "logarithmic",
+      "pattern": "{a}*log(x) + {b}",
+      "description": "Logarithmic model",
+      "category": "logarithmic",
+      "commonness": 85
+    },
+    {
+      "name": "natural_logarithmic",
+      "pattern": "{a}*ln(x) + {b}",
+      "description": "Natural log model",
+      "category": "logarithmic",
+      "commonness": 85
+    },
+    {
+      "name": "compound_interest",
+      "pattern": "{p}*(1 + {r})**{n}",
+      "description": "Compound interest formula",
+      "category": "exponential",
+      "commonness": 90
+    },
+    {
+      "name": "continuous_compound_interest",
+      "pattern": "{p}*exp({r}*{t})",
+      "description": "Continuous compound interest formula",
+      "category": "exponential",
+      "commonness": 85
+    },
+    {
+      "name": "log_sum",
+      "pattern": "log(x) + log({a})",
+      "description": "Sum of logarithms",
+      "category": "logarithmic",
+      "commonness": 70
+    },
+    {
+      "name": "log_difference",
+      "pattern": "log(x) - log({a})",
+      "description": "Difference of logarithms",
+      "category": "logarithmic",
+      "commonness": 70
+    },
+    {
+      "name": "log_ratio",
+      "pattern": "log(x/{a})",
+      "description": "Logarithm of a ratio",
+      "category": "logarithmic",
+      "commonness": 75
+    }
+  ],
+  "calculus": [
+    {
+      "name": "derivative_power_rule",
+      "pattern": "d/dx(x**{n})",
+      "description": "Derivative using power rule",
+      "category": "calculus",
+      "commonness": 90
+    },
+    {
+      "name": "derivative_exponential",
+      "pattern": "d/dx(exp({a}*x))",
+      "description": "Derivative of exponential function",
+      "category": "calculus",
+      "commonness": 85
+    },
+    {
+      "name": "derivative_sine",
+      "pattern": "d/dx(sin({a}*x))",
+      "description": "Derivative of sine function",
+      "category": "calculus",
+      "commonness": 85
+    },
+    {
+      "name": "derivative_cosine",
+      "pattern": "d/dx(cos({a}*x))",
+      "description": "Derivative of cosine function",
+      "category": "calculus",
+      "commonness": 85
+    },
+    {
+      "name": "indefinite_integral_power",
+      "pattern": "∫ x**{n} dx",
+      "description": "Indefinite integral of x^n",
+      "category": "calculus",
+      "commonness": 90
+    },
+    {
+      "name": "indefinite_integral_exponential",
+      "pattern": "∫ exp({a}*x) dx",
+      "description": "Indefinite integral of exponential",
+      "category": "calculus",
+      "commonness": 80
+    },
+    {
+      "name": "indefinite_integral_sine",
+      "pattern": "∫ sin({a}*x) dx",
+      "description": "Indefinite integral of sine",
+      "category": "calculus",
+      "commonness": 80
+    },
+    {
+      "name": "indefinite_integral_cosine",
+      "pattern": "∫ cos({a}*x) dx",
+      "description": "Indefinite integral of cosine",
+      "category": "calculus",
+      "commonness": 80
+    },
+    {
+      "name": "definite_integral_basic",
+      "pattern": "∫_{a}^{b} f(x) dx",
+      "description": "Definite integral from a to b",
+      "category": "calculus",
+      "commonness": 85
+    },
+    {
+      "name": "limit_basic",
+      "pattern": "lim_{x->a} f(x)",
+      "description": "Limit of function at point a",
+      "category": "calculus",
+      "commonness": 85
+    }
+  ],
+  "statistics": [
+    {
+      "name": "arithmetic_mean",
+      "pattern": "({x1} + {x2} + {x3})/3",
+      "description": "Arithmetic mean of three values",
+      "category": "statistics",
+      "commonness": 90
+    },
+    {
+      "name": "weighted_mean",
+      "pattern": "({w1}*{x1} + {w2}*{x2})/({w1} + {w2})",
+      "description": "Weighted mean of two values",
+      "category": "statistics",
+      "commonness": 80
+    },
+    {
+      "name": "variance_sample",
+      "pattern": "sum((x_i - mean)**2)/({n}-1)",
+      "description": "Sample variance formula",
+      "category": "statistics",
+      "commonness": 85
+    },
+    {
+      "name": "standard_deviation",
+      "pattern": "sqrt(variance)",
+      "description": "Standard deviation as square root of variance",
+      "category": "statistics",
+      "commonness": 85
+    },
+    {
+      "name": "z_score",
+      "pattern": "({x} - mean)/std",
+      "description": "Z-score formula",
+      "category": "statistics",
+      "commonness": 85
+    },
+    {
+      "name": "linear_regression_line",
+      "pattern": "{a}*x + {b}",
+      "description": "Simple linear regression line",
+      "category": "statistics",
+      "commonness": 80
+    },
+    {
+      "name": "probability_binomial",
+      "pattern": "nCr({n}, {k})*p**{k}*(1-p)**({n}-{k})",
+      "description": "Binomial probability formula",
+      "category": "statistics",
+      "commonness": 80
+    },
+    {
+      "name": "probability_geometric",
+      "pattern": "(1-p)**({k}-1)*p",
+      "description": "Geometric probability formula",
+      "category": "statistics",
+      "commonness": 75
+    },
+    {
+      "name": "bayes_theorem",
+      "pattern": "(P_A_given_B*P_B)/P_A",
+      "description": "Bayes theorem pattern",
+      "category": "statistics",
+      "commonness": 75
+    },
+    {
+      "name": "normal_distribution_pdf",
+      "pattern": "(1/(sqrt(2*pi)*sigma))*exp(-(x-mu)**2/(2*sigma**2))",
+      "description": "Normal distribution probability density function",
+      "category": "statistics",
+      "commonness": 80
+    }
+  ]
 }
