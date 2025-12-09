@@ -1,17 +1,16 @@
 ### History Panel widget for the calculator
-
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel,
     QPushButton, QListWidget, QListWidgetItem
 )
 
 from PyQt6.QtCore import Qt, pyqtSignal
-from PyQt6.QtGui import QFont
+from PyQt6.QtGui import QFont 
 from ..gui.history_window import HistoryWindow
 
 class HistoryPanel(QWidget):
     ### widget that displays calculation history
-    history_item_selected = pyqtSignal(dict)  # Changed to dict to pass both expressions
+    history_item_selected = pyqtSignal(dict)
     
     def __init__(self, parent=None):
         super().__init__(parent)
