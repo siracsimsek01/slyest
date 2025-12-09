@@ -169,11 +169,27 @@ CALCULATOR_STYLESHEET = f"""
         min-width: 70px;
     }}
 
+    QPushButton#help {{
+        border-radius: 15px;       /* half of width/height */
+        background-color: {COLORS['operation_btn']};
+        color: white;
+        font-weight: bold;
+        border: none;
+    }}
+
     QPushButton#symbolicBtn:hover {{
         background-color: #E68A00;
     }}
 
     QPushButton#symbolicBtn:pressed {{
+        background-color: #CC7A00;
+    }}
+
+    QPushButton#help:hover {{
+        background-color: #E68A00;
+    }}
+
+    QPushButton#help:pressed {{
         background-color: #CC7A00;
     }}
 """

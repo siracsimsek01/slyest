@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
-    QLabel, QPushButton, QLineEdit, QScrollArea, QSizePolicy
+    QLabel, QPushButton, QLineEdit, QScrollArea, QSizePolicy, QMessageBox
 )
 from PyQt6.QtCore import Qt
 
@@ -10,6 +10,7 @@ from ..core.math_formatter import MathFormatter
 from ..gui.calculator_buttons import CalculatorButton
 from ..gui.styles import get_calculator_stylesheet
 from ..gui.variable_window import VariableWindow
+from ..gui.learning_mode_window import LearningModeWindow
 from ..gui.history_panel import HistoryPanel
 from ..gui.calculator_operations import CalculatorOperations
 from src.app.core.perform_substitution import Substitution
@@ -32,6 +33,7 @@ class MainWindow(QMainWindow):
         self.operations = CalculatorOperations(self.engine)
         self.plotter = ExpressionPlotter()
         self.current_expression = ""
+        self.operation = ""
         self.setStyleSheet(get_calculator_stylesheet())
         self.initialise_ui()
 
@@ -98,6 +100,8 @@ class MainWindow(QMainWindow):
         parent_layout.addWidget(self.optional_expression_input)
         self.create_symbolic_buttons(parent_layout)
 
+        container = QWidget()
+        display_layout = QHBoxLayout(container)
         self.display = QLabel("0")
         self.display.setObjectName("display")
         self.display.setMinimumHeight(100)
@@ -110,7 +114,11 @@ class MainWindow(QMainWindow):
         scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
         
-        parent_layout.addWidget(self.display)
+        display_layout.addWidget(self.display)
+        help_btn = self.create_new_button("?", "help", self.launch_learning_mode)
+        help_btn.setFixedSize(30, 30)
+        display_layout.addWidget(help_btn)
+        parent_layout.addWidget(container)
 
     def handle_expression_input(self):
         pass
@@ -426,6 +434,7 @@ class MainWindow(QMainWindow):
     def handle_equals_click(self):
         current_text = self._get_internal_text(self.expression_input)
         result = self.operations.calculate_result(current_text)
+        self.operation = ""
         if result is not None:
             expression, answer = result
             self._set_formatted_text(self.expression_input, expression)
@@ -434,6 +443,7 @@ class MainWindow(QMainWindow):
 
     def handle_clear_click(self):
         result = self.operations.clear_all()
+        self.operation = ""
         if result is not None:
             self._set_formatted_text(self.expression_input, result)
             self._set_formatted_text(self.optional_expression_input, result)
@@ -545,6 +555,7 @@ class MainWindow(QMainWindow):
 
     def handle_memory_click(self, action: str):
         current = self.display.text()
+        self.operation = ""
         if current == '' or current == 'Error':
             current = '0'
         elif '/' in current:
@@ -580,6 +591,7 @@ class MainWindow(QMainWindow):
             self._set_formatted_text(self.expression_input, result)
 
     def handle_symbolic_operation(self, operation: str):
+        self.operation = operation
         try:
             expression_string = self._get_internal_text(self.expression_input)
             optional_expression_string = self._get_internal_text(self.optional_expression_input)
@@ -607,10 +619,10 @@ class MainWindow(QMainWindow):
             self.display.setText(MathFormatter.to_display(result))
 
             self.history_panel.add_calculation(
-                expression_string,
-                result,
-                operation=operation,
-                optional_expression=optional_expression_string if optional_expression_string else None
+                self.expression_input.text(),
+                self.display.text(),
+                operation=self.operation,
+                optional_expression=self.optional_expression_input.text() if optional_expression_string else None
             )
         except:
             return
@@ -632,12 +644,17 @@ class MainWindow(QMainWindow):
         return manage_btn
     
     def handle_std_click(self):
-        
         current_text = self.display.text()
-
         result, success = toggle_format(current_text)
-        
         if success:
             self.display.setText(result)
         else:
             print(f"Toggle failed: {result}")
+
+    def launch_learning_mode(self):
+        if self.operation:
+            learning_mode_window = LearningModeWindow(self.operation, self.expression_input.text(),
+                self.display.text(), self.optional_expression_input.text())
+            learning_mode_window.exec()
+        else:
+            QMessageBox.critical(self, "Error", "Learning mode is not available for this operation.")
