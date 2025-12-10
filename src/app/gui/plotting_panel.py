@@ -145,7 +145,6 @@ class PlottingPanel(QWidget):
             QMessageBox.warning(self, "Warning", "Please enter an expression")
             return
     
-        # Update variables before plotting
         if hasattr(self.app, 'engine') and hasattr(self.app.engine, 'list_variables'):
             self.plotter.set_variables(self.app.engine.list_variables())
     
@@ -162,10 +161,16 @@ class PlottingPanel(QWidget):
             QMessageBox.critical(self, "Error", str(e))
     
     def plot_multiple(self):
+        if hasattr(self.app, 'engine') and hasattr(self.app.engine, 'list_variables'):
+            self.plotter.set_variables(self.app.engine.list_variables())
+    
         dialog = MultipleExpressionDialog(self, self.plotter, self.window_manager, self._get_parameters)
         dialog.exec()
-    
+
     def plot_parametric(self):
+        if hasattr(self.app, 'engine') and hasattr(self.app.engine, 'list_variables'):
+            self.plotter.set_variables(self.app.engine.list_variables())
+    
         dialog = ParametricPlotDialog(self, self.plotter, self.window_manager, self._get_parameters)
         dialog.exec()
     
