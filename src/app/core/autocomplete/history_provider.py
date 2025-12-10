@@ -63,8 +63,7 @@ class HistoryProvider:
                 score=final_score,
                 description=f"Used {self.usage_frequency.get(expr, 1)} time(s)",
                 category="history",
-                usage_count=self.usage_frequency.get(expr, 1),
-                last_used=self.recency_scores.get(expr)
+                usage_count=self.usage_frequency.get(expr, 1)
             )
 
             suggestions.append(suggestion)
