@@ -13,6 +13,7 @@ from ..gui.variable_window import VariableWindow
 from ..gui.learning_mode_window import LearningModeWindow
 from ..gui.history_panel import HistoryPanel
 from ..gui.calculator_operations import CalculatorOperations
+from ..gui.plotting_panel import PlottingPanel
 from src.app.core.perform_substitution import Substitution
 from src.app.core.algebraic_expressions import AlgebraicExpressions
 from src.app.core.two_linear_equations import TwoLinearEquations
@@ -140,7 +141,8 @@ class MainWindow(QMainWindow):
         button_layout.addWidget(self.create_new_button("Substitute", "symbolicBtn", lambda: self.handle_symbolic_operation('substitute'))) # substitute
         button_layout.addWidget(self.create_new_button("Solve 2 Equations", "symbolicBtn", lambda: self.handle_symbolic_operation('solve 2 equations'))) # sovle 2 equations
         button_layout.addWidget(self.create_new_button("Differentiate", "symbolicBtn", lambda: self.handle_symbolic_operation('differentiate'))) # differentiate
-
+        button_layout.addWidget(self.create_new_button("Plot", "symbolicBtn", self.open_plotting_panel))  # plot
+        
         parent_layout.addWidget(button_container)
 
     def create_history_panel(self, parent_layout):
@@ -658,3 +660,22 @@ class MainWindow(QMainWindow):
             learning_mode_window.exec()
         else:
             QMessageBox.critical(self, "Error", "Learning mode is not available for this operation.")
+
+    def get_current_expression(self):
+        return self._get_internal_text(self.expression_input)
+    
+    def open_plotting_panel(self):
+        from PyQt6.QtWidgets import QDialog
+        
+        self.plotting_dialog = QDialog(self)
+        self.plotting_dialog.setWindowTitle("SLYEST - Plotting")
+        self.plotting_dialog.resize(900, 700)
+        
+        layout = QVBoxLayout()
+        
+        plotting_panel = PlottingPanel(application_reference=self, parent=self.plotting_dialog)
+        plotting_panel.update_variables(self.engine.list_variables())  
+        layout.addWidget(plotting_panel)
+        
+        self.plotting_dialog.setLayout(layout)
+        self.plotting_dialog.show()
