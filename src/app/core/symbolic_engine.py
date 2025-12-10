@@ -109,8 +109,7 @@ class SymbolicEngine:
             var = Symbol(optional_expression_input)
             return diff(expr, var)
         else:
-            return "Enter only one variable."
-    
+            return "Enter only one variable."   
     def find_symbol(self, expr):
          for char in expr:
             if char.isalpha():

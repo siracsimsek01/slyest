@@ -1,16 +1,17 @@
 import unittest
-from symbolic_engine import integrate
-from symbolic_engine import simplify  # optional
+from symbolic_engine import integrate, simplify
 
 class TestIntegration(unittest.TestCase):
 
     def assertSymbolicEqual(self, result, expected):
+        
         try:
-            simplified = simplify(f"({result}) - ({expected})")
-            self.assertEqual(simplified, "0")
+            diff = simplify(f"({result}) - ({expected})")
+            self.assertEqual(diff, "0")
         except Exception:
+           
             self.assertEqual(
-                result.replace(" ", ""),
+                result.replace(" ", ""), 
                 expected.replace(" ", "")
             )
 
@@ -32,9 +33,24 @@ class TestIntegration(unittest.TestCase):
     def test_constant(self):
         self.assertSymbolicEqual(integrate("5", "x"), "5*x")
 
+    def test_zero(self):
+        self.assertSymbolicEqual(integrate("0", "x"), "C")  # or "0" depending on your design
+
+    def test_wrong_variable(self):
+        # ∫ x dy = x*y
+        self.assertSymbolicEqual(integrate("x", "y"), "x*y")
+
+    def test_product(self):
+        # ∫ x*sin(x) dx = -x*cos(x) + sin(x)
+        self.assertSymbolicEqual(
+            integrate("x*sin(x)", "x"),
+            "-x*cos(x) + sin(x)"
+        )
+
     def test_constant_of_integration(self):
         result = integrate("x", "x")
         self.assertTrue("C" in result or "c" in result or result == "x^2/2")
+
 
 if __name__ == "__main__":
     unittest.main()
