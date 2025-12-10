@@ -708,9 +708,9 @@ class MainWindow(QMainWindow):
         
         layout = QVBoxLayout()
         
-        plotting_panel = PlottingPanel(application_reference=self, parent=self.plotting_dialog)
-        plotting_panel.update_variables(self.engine.list_variables())  
-        layout.addWidget(plotting_panel)
+        self.plotting_panel_instance = PlottingPanel(application_reference=self, parent=self.plotting_dialog)
+        self.plotting_panel_instance.update_variables(self.engine.list_variables())
+        layout.addWidget(self.plotting_panel_instance)
         
         self.plotting_dialog.setLayout(layout)
         self.plotting_dialog.show()

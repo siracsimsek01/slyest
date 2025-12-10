@@ -10,7 +10,6 @@ from sympy.parsing.sympy_parser import (
     implicit_multiplication_application
 )
 
-
 class ExpressionPlotter:
 
     def __init__(self, variables: Optional[Dict[str, str]] = None):
@@ -61,14 +60,23 @@ class ExpressionPlotter:
                 expr = self._substitute_variables(expr)
 
             x = sp.symbols(variable)
-            f = sp.lambdify(x, expr, 'numpy')
-
+            
             x_range = x_range or self.default_range
             num_points = num_points or self.default_points
             xs = np.linspace(float(x_range[0]), float(x_range[1]), num_points)
-
-            with np.errstate(divide='ignore', invalid='ignore'):
-                ys = f(xs)
+            
+            free_vars = expr.free_symbols
+            if len(free_vars) > 1:
+                var_names = ', '.join(str(v) for v in free_vars)
+                raise ValueError(f"Expression contains multiple variables ({var_names}). 2D plotting requires a single variable. Try using variable substitution to reduce to one variable.")
+            
+            if len(free_vars) == 0:
+                const_value = float(expr.evalf())
+                ys = np.full_like(xs, const_value)
+            else:
+                f = sp.lambdify(x, expr, 'numpy')
+                with np.errstate(divide='ignore', invalid='ignore'):
+                    ys = f(xs)
 
             fig, ax = plt.subplots(figsize=(8, 6))
             ax.plot(xs, ys, label=str(expr), linewidth=2)
@@ -101,6 +109,17 @@ class ExpressionPlotter:
                 y_expr = self._substitute_variables(y_expr)
 
             t = sp.symbols(parameter)
+            
+            x_free_vars = x_expr.free_symbols
+            if len(x_free_vars) > 1:
+                var_names = ', '.join(str(v) for v in x_free_vars)
+                raise ValueError(f"X expression contains multiple variables ({var_names}). Parametric plotting requires expressions of a single parameter.")
+            
+            y_free_vars = y_expr.free_symbols
+            if len(y_free_vars) > 1:
+                var_names = ', '.join(str(v) for v in y_free_vars)
+                raise ValueError(f"Y expression contains multiple variables ({var_names}). Parametric plotting requires expressions of a single parameter.")
+            
             fx = sp.lambdify(t, x_expr, 'numpy')
             fy = sp.lambdify(t, y_expr, 'numpy')
 
@@ -146,9 +165,18 @@ class ExpressionPlotter:
                 if substitute_vars:
                     expr = self._substitute_variables(expr)
 
-                f = sp.lambdify(x, expr, 'numpy')
-                with np.errstate(divide='ignore', invalid='ignore'):
-                    ys = f(xs)
+                free_vars = expr.free_symbols
+                if len(free_vars) > 1:
+                    var_names = ', '.join(str(v) for v in free_vars)
+                    raise ValueError(f"Expression '{expr}' contains multiple variables ({var_names}). Please use single-variable expressions only.")   
+
+                if len(expr.free_symbols) == 0:
+                    const_value = float(expr.evalf())
+                    ys = np.full_like(xs, const_value)
+                else:
+                    f = sp.lambdify(x, expr, 'numpy')
+                    with np.errstate(divide='ignore', invalid='ignore'):
+                        ys = f(xs)
 
                 label = labels[i] if labels and i < len(labels) else str(expr)
                 ax.plot(xs, ys, label=label, linewidth=2)
@@ -163,7 +191,6 @@ class ExpressionPlotter:
             return fig
         except Exception as e:
             raise ValueError(f"Error plotting multiple expressions: {e}")
-
 
 class PlotWindowManager:
     
