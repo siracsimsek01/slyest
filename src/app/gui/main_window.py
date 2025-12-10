@@ -18,6 +18,7 @@ from src.app.core.perform_substitution import Substitution
 from src.app.core.algebraic_expressions import AlgebraicExpressions
 from src.app.core.two_linear_equations import TwoLinearEquations
 from src.app.core.symbolic_to_decimal import toggle_format
+from ..core.session import SessionManager, HistoryEntry
 from sympy import sympify
 
 class MainWindow(QMainWindow):
@@ -26,6 +27,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("SLYEST - Scientific Calculator")
         self.setGeometry(100, 100, 800, 900)
 
+        self.session = SessionManager()
         self.engine = SymbolicEngine()
         self.substitution = Substitution()
         self.equation_solver = AlgebraicExpressions()
@@ -147,7 +149,7 @@ class MainWindow(QMainWindow):
 
     def create_history_panel(self, parent_layout):
         """create the history panel (collapsible)."""
-        self.history_panel = HistoryPanel()
+        self.history_panel = HistoryPanel(session_manager=self.session)
         self.history_panel.history_item_selected.connect(self.use_history_item)
         self.history_panel.setVisible(False) 
         self.history_panel.setMaximumHeight(200)
@@ -591,7 +593,26 @@ class MainWindow(QMainWindow):
             result = self.operations.symbols(action, current)
         if result is not None:
             self._set_formatted_text(self.expression_input, result)
+    
+    def get_relevant_variables(self, expression_str):
+        relevant_vars = {}
+        try:
+            defined_vars = self.engine.list_variables()   
+            if not defined_vars:
+                return {}
+            expr = self.engine.parse_expression(expression_str)          
 
+            used_symbols = {str(s) for s in expr.free_symbols}
+            for name, value in defined_vars.items():
+                if name in used_symbols:
+                    relevant_vars[name] = str(value)
+                    
+            return relevant_vars
+            
+        except Exception:
+          
+            return {}
+        
     def handle_symbolic_operation(self, operation: str):
         self.operation = operation
         try:
@@ -599,25 +620,34 @@ class MainWindow(QMainWindow):
             optional_expression_string = self._get_internal_text(self.optional_expression_input)
             if not expression_string:
                 return
-            expression_string = self.engine.replace_variables(expression_string, operation)
+            
+            
+          
+            used_vars = self.get_relevant_variables(expression_string)
+
+            
+            expression_string_processed = self.engine.replace_variables(expression_string, operation)
             if optional_expression_string:
-                optional_expression_string = self.engine.replace_variables(optional_expression_string, operation)
+                optional_expression_string_processed = self.engine.replace_variables(optional_expression_string, operation)
+            else:
+                optional_expression_string_processed = None
 
             if operation == "simplify":
-                result = str(self.engine.simplify(expression_string))
+                result = str(self.engine.simplify(expression_string_processed))
             elif operation == 'expand':
-                result = str(self.engine.expand(expression_string))
+                result = str(self.engine.expand(expression_string_processed))
             elif operation == 'factor':
-                result = str(self.engine.factor(expression_string))
+                result = str(self.engine.factor(expression_string_processed))
             elif operation == 'solve':
-                result = str(self.equation_solver.solve_algerbraic_equation(expression_string))
+                result = str(self.equation_solver.solve_algerbraic_equation(expression_string_processed))
             elif operation == 'substitute':
                 substituted_values = self.get_substituted_values(optional_expression_string)
-                result = str(self.substitution.perform_substitution(expression_string, substituted_values))
+                result = str(self.substitution.perform_substitution(expression_string_processed, substituted_values))
             elif operation == 'solve 2 equations':
-                result = str(self.two_equations_solver.solve_two_linear_equations(expression_string, optional_expression_string))
+                result = str(self.two_equations_solver.solve_two_linear_equations(expression_string_processed, optional_expression_string_processed))
             elif operation == 'differentiate':
-                result = str(self.engine.differentiate(expression_string, optional_expression_string))
+                result = str(self.engine.differentiate(expression_string_processed, optional_expression_string_processed))
+            
             self.display.setText(MathFormatter.to_display(result))
 
             self.history_panel.add_calculation(
@@ -626,7 +656,20 @@ class MainWindow(QMainWindow):
                 operation=self.operation,
                 optional_expression=self.optional_expression_input.text() if optional_expression_string else None
             )
-        except:
+
+            entry = HistoryEntry(
+                operation, 
+                self.expression_input.text(), 
+                result, 
+                optional_expression_string,
+                variables=used_vars 
+            )
+            
+            if hasattr(self, 'session'):
+                 self.session.history.append(entry)
+
+        except Exception as e:
+            print(f"Error: {e}")
             return
         
     def get_substituted_values(self, subs_str):
