@@ -37,6 +37,7 @@ class MainWindow(QMainWindow):
         self.plotter = ExpressionPlotter()
         self.current_expression = ""
         self.operation = ""
+        self.used_vars = dict()
         self.setStyleSheet(get_calculator_stylesheet())
         self.initialise_ui()
 
@@ -601,16 +602,12 @@ class MainWindow(QMainWindow):
             if not defined_vars:
                 return {}
             expr = self.engine.parse_expression(expression_str)          
-
             used_symbols = {str(s) for s in expr.free_symbols}
             for name, value in defined_vars.items():
                 if name in used_symbols:
-                    relevant_vars[name] = str(value)
-                    
+                    relevant_vars[name] = str(value)    
             return relevant_vars
-            
         except Exception:
-          
             return {}
         
     def handle_symbolic_operation(self, operation: str):
@@ -620,12 +617,7 @@ class MainWindow(QMainWindow):
             optional_expression_string = self._get_internal_text(self.optional_expression_input)
             if not expression_string:
                 return
-            
-            
-          
-            used_vars = self.get_relevant_variables(expression_string)
-
-            
+            self.used_vars = self.get_relevant_variables(expression_string)
             expression_string_processed = self.engine.replace_variables(expression_string, operation)
             if optional_expression_string:
                 optional_expression_string_processed = self.engine.replace_variables(optional_expression_string, operation)
@@ -660,9 +652,9 @@ class MainWindow(QMainWindow):
             entry = HistoryEntry(
                 operation, 
                 self.expression_input.text(), 
-                result, 
+                self.display.text(), 
                 optional_expression_string,
-                variables=used_vars 
+                variables=self.used_vars 
             )
             
             if hasattr(self, 'session'):
@@ -699,7 +691,7 @@ class MainWindow(QMainWindow):
     def launch_learning_mode(self):
         if self.operation:
             learning_mode_window = LearningModeWindow(self.operation, self.expression_input.text(),
-                self.display.text(), self.optional_expression_input.text())
+                self.display.text(), self.optional_expression_input.text() )
             learning_mode_window.exec()
         else:
             QMessageBox.critical(self, "Error", "Learning mode is not available for this operation.")
