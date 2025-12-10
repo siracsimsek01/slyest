@@ -11,11 +11,11 @@ from reportlab.pdfbase.pdfmetrics import stringWidth
 class HistoryEntry:
     
     def __init__(self, operation: str, input_expr: str, result: sp.Expr, optional_input_expr=None, timestamp: Optional[datetime] = None):
-        self.operation = operation  # simplify, differentiate
-        self.input_expr = input_expr  # The expression before calculation
+        self.operation = operation
+        self.input_expr = input_expr
         self.optional_input_expr = optional_input_expr
-        self.result = result  # The resulting expression
-        self.timestamp = timestamp if timestamp else datetime.now()  # When it was done
+        self.result = result
+        self.timestamp = timestamp if timestamp else datetime.now()
         
     
     def to_dict(self) -> Dict[str, Any]:
@@ -29,22 +29,20 @@ class HistoryEntry:
         }
 
     def __str__(self) -> str:
-        """Make it look nice when we print it."""
         if self.optional_input_expr:
             return f"[{self.timestamp.strftime('%H:%M:%S')}] {self.operation}: {self.input_expr}| {self.optional_input_expr} → {self.result}"
         return f"[{self.timestamp.strftime('%H:%M:%S')}] {self.operation}: {self.input_expr} → {self.result}"
     
     
 class SessionManager:
-    
     def __init__(self, max_history: int = 100):
-        self.history: List[HistoryEntry] = [] # empty history list to store
-        self.max_history = max_history  # Limit how many entries we keep
-        self.session_start = datetime.now() # remembers when the session started
+        self.history: List[HistoryEntry] = []
+        self.max_history = max_history
+        self.session_start = datetime.now()
         
     def get_history(self, limit: Optional[int] = None) -> List[HistoryEntry]:
         if limit:
-            return self.history[-limit:]  # return the last 'limit' entries
+            return self.history[-limit:]
         return self.history.copy()
     
     def get_entry(self, index: int) -> HistoryEntry:
@@ -56,7 +54,6 @@ class SessionManager:
         return None
     
     def clear_history(self):
-        
         self.history.clear()
         
     def export_history(self, format, name, calculation_list):
@@ -67,15 +64,32 @@ class SessionManager:
         else:
             raise ValueError(f"Unsupported export format: {format}")
         
-    def export_text(self, name, calculation_list):
+    """def export_text(self, name, calculation_list):
         os.makedirs("HistoryFiles", exist_ok=True)
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = f"{name}_{timestamp}.txt"
         filepath = os.path.join("HistoryFiles", filename)
+
         with open(filepath, "w", encoding="utf-8") as file:
             for index, item in enumerate(calculation_list):
                 file.write(str(index + 1) + ". " + item + "\n")
+        return filepath"""
+    
+    def export_text(self, name, calculation_list):
+        filepath = self.create_text_file(name)
+        self.write_text_file(filepath, calculation_list)
         return filepath
+    
+    def create_text_file(self, name):
+        os.makedirs("HistoryFiles", exist_ok = True)
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"{name}_{timestamp}.txt"
+        return os.path.join("HistoryFiles", filename)
+    
+    def write_text_file(self, filepath, calculation_list):
+        with open(filepath, "w", encoding = "utf-8") as file:
+            for index, item in enumerate(calculation_list):
+                file.write(str(index + 1) + ". " + item + "\n")
     
     def export_pdf(self, name, calculation_list):
         pdf_file_name = f'{name}.pdf'
