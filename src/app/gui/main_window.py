@@ -1,6 +1,7 @@
 from PyQt6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
-    QLabel, QPushButton, QLineEdit, QScrollArea, QSizePolicy, QMessageBox
+    QLabel, QPushButton, QLineEdit, QScrollArea, QSizePolicy, QMessageBox,
+    QDialog
 )
 from PyQt6.QtCore import Qt
 
@@ -700,17 +701,18 @@ class MainWindow(QMainWindow):
         return self._get_internal_text(self.expression_input)
     
     def open_plotting_panel(self):
-        from PyQt6.QtWidgets import QDialog
-        
         self.plotting_dialog = QDialog(self)
         self.plotting_dialog.setWindowTitle("SLYEST - Plotting")
         self.plotting_dialog.resize(900, 700)
-        
+
         layout = QVBoxLayout()
-        
-        self.plotting_panel_instance = PlottingPanel(application_reference=self, parent=self.plotting_dialog)
+
+        self.plotting_panel_instance = PlottingPanel(
+            application_reference=self,
+            parent=self.plotting_dialog
+        )
         self.plotting_panel_instance.update_variables(self.engine.list_variables())
         layout.addWidget(self.plotting_panel_instance)
-        
+
         self.plotting_dialog.setLayout(layout)
         self.plotting_dialog.show()
