@@ -154,6 +154,7 @@ class MainWindow(QMainWindow):
         button_layout.addWidget(self.create_new_button("Substitute", "symbolicBtn", lambda: self.handle_symbolic_operation('substitute'))) # substitute
         button_layout.addWidget(self.create_new_button("Solve 2 Equations", "symbolicBtn", lambda: self.handle_symbolic_operation('solve 2 equations'))) # sovle 2 equations
         button_layout.addWidget(self.create_new_button("Differentiate", "symbolicBtn", lambda: self.handle_symbolic_operation('differentiate'))) # differentiate
+        button_layout.addWidget(self.create_new_button("Integrate", "symbolicBtn", lambda: self.handle_symbolic_operation('integrate')))
         button_layout.addWidget(self.create_new_button("Plot", "symbolicBtn", self.open_plotting_panel))  # plot
         
         parent_layout.addWidget(button_container)
@@ -649,7 +650,9 @@ class MainWindow(QMainWindow):
                 result = str(self.two_equations_solver.solve_two_linear_equations(expression_string_processed, optional_expression_string_processed))
             elif operation == 'differentiate':
                 result = str(self.engine.differentiate(expression_string_processed, optional_expression_string_processed))
-            
+            elif operation == 'integrate':
+                result = str(self.engine.integrate(expression_string, optional_expression_string))
+
             self.display.setText(MathFormatter.to_display(result))
 
             self.history_panel.add_calculation(

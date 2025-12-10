@@ -101,6 +101,38 @@ class SymbolicEngine:
             return sp.sympify(expression, locals=self.variables)
         return expression
     
+    def integrate(self, expr, optional_expression_input):
+        try:
+            # Convert string → SymPy expression
+            sympy_expr = sympify(expr)
+
+            # Case 1: no variable specified → infer variable
+            if not optional_expression_input:
+                var = self._infer_variable(sympy_expr)
+                return sp.integrate(sympy_expr, var)
+
+            # Case 2: user provides a variable (must be alphabetic)
+            if optional_expression_input.isalpha() and len(optional_expression_input) == 1:
+                var = Symbol(optional_expression_input)
+                return sp.integrate(sympy_expr, var)
+
+            return "Enter only one variable to integrate with respect to (e.g., 'x')."
+
+        except Exception as e:
+            return f"Integration error: {str(e)}"
+        
+            
+    def _infer_variable(self, sympy_expr):
+        free_vars = list(sympy_expr.free_symbols)
+        if len(free_vars) == 1:
+            return free_vars[0]
+        elif len(free_vars) == 0:
+            return Symbol('x')  # integrate constants wrt x
+        else:
+            raise ValueError("Multiple variables detected. Specify the integration variable.")
+
+
+    
     def differentiate(self, expr, optional_expression_input):
         if not optional_expression_input:
             var = Symbol(self.find_symbol(expr))
@@ -109,8 +141,7 @@ class SymbolicEngine:
             var = Symbol(optional_expression_input)
             return diff(expr, var)
         else:
-            return "Enter only one variable."
-    
+            return "Enter only one variable."   
     def find_symbol(self, expr):
          for char in expr:
             if char.isalpha():
