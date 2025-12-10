@@ -12,9 +12,10 @@ class HistoryPanel(QWidget):
     ### widget that displays calculation history
     history_item_selected = pyqtSignal(dict)
     
-    def __init__(self, parent=None):
+    def __init__(self, session_manager=None, parent=None):
         super().__init__(parent)
         self.setObjectName("historyPanel")
+        self.session_manager = session_manager
         self.calculation_history = []
         self.initialise_ui()
         
@@ -101,12 +102,17 @@ class HistoryPanel(QWidget):
                 'expression': data,
                 'optional_expression': None
             })
-
     def clear_history(self):
         self.history_list.clear()
+        if self.session_manager:
+            self.session_manager.clear_history()
 
     def export_history(self):
-        history_window = HistoryWindow(self.calculation_history)
+        if self.session_manager:
+            data_to_export = self.session_manager.get_history()
+        else:
+            data_to_export = self.calculation_history           
+        history_window = HistoryWindow(data_to_export)
         history_window.exec()
 
     def toggle_visibility(self):
