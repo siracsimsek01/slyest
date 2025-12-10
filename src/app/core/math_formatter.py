@@ -20,6 +20,7 @@ class MathFormatter:
         result = internal_expr
         result = cls._convert_functions(result)
         result = cls._convert_exponents(result)
+        result = cls._hide_implicit_multiplication(result)
         result = result.replace('*', '×')
         result = result.replace('/', '÷')
 
@@ -68,6 +69,30 @@ class MathFormatter:
             return superscript
 
         return re.sub(r'\*\*([0-9]+|[a-z])', replace_exponent, text)
+
+    @classmethod
+    def _hide_implicit_multiplication(cls, text: str) -> str:
+        
+        text = re.sub(r'(\d+)\*([a-zA-Z])', r'\1\2', text)
+
+        
+        text = re.sub(r'([a-zA-Z])\*([a-zA-Z])', r'\1\2', text)
+
+        
+        text = re.sub(r'(\d+)\*\(', r'\1(', text)
+
+        
+        text = re.sub(r'\)\*(\d+)', r')\1', text)
+
+        
+        text = re.sub(r'\)\*([a-zA-Z])', r')\1', text)
+
+        
+        text = re.sub(r'([a-zA-Z])\*\(', r'\1(', text)
+        
+        text = re.sub(r'\)\*\(', r')(', text)
+
+        return text
 
     @classmethod
     def _convert_superscripts_to_power(cls, text: str) -> str:

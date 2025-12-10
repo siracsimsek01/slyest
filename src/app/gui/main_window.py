@@ -439,7 +439,7 @@ class MainWindow(QMainWindow):
     def handle_equals_click(self):
         current_text = self._get_internal_text(self.expression_input)
         result = self.operations.calculate_result(current_text)
-        self.operation = ""
+        self.operation = "calculate"
         if result is not None:
             expression, answer = result
             self._set_formatted_text(self.expression_input, expression)
