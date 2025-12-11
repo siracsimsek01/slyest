@@ -32,7 +32,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("SLYEST - Scientific Calculator")
-        self.setGeometry(100, 100, 800, 900)
+        self.setGeometry(100, 100, 1100, 900)
 
         self.session = SessionManager()
         self.engine = SymbolicEngine()
@@ -100,7 +100,7 @@ class MainWindow(QMainWindow):
 
         self.optional_expression_input = QLineEdit()
         self.optional_expression_input.setObjectName("optionalExpressionInput")
-        self.optional_expression_input.setPlaceholderText("Optional: e.g., x=5, y=3 for substitution <or> x - y = 12 for solving two linear equations....")
+        self.optional_expression_input.setPlaceholderText("Optional: e.g., x=5, y=3 for substitution <or> x - y = 12 for solving two linear equations, x for differentiation/integration, etc....")
 
         self.expression_input.setMinimumHeight(40)
         self.expression_input.returnPressed.connect(self.handle_expression_input)
@@ -441,7 +441,8 @@ class MainWindow(QMainWindow):
             expression, answer = result
             self._set_formatted_text(self.expression_input, expression)
             self.display.setText(MathFormatter.to_display(answer))
-            self.history_panel.add_calculation(expression, answer)
+            if not "Error" in result:
+                self.history_panel.add_calculation(expression, answer)
 
     def handle_clear_click(self):
         result = self.operations.clear_all()
@@ -637,7 +638,7 @@ class MainWindow(QMainWindow):
             elif operation == 'differentiate':
                 result = str(self.engine.differentiate(expression_string_processed, optional_expression_string_processed))
             elif operation == 'integrate':
-                result = str(self.engine.integrate(expression_string, optional_expression_string))
+                result = str(self.engine.integrate(expression_string_processed, optional_expression_string_processed))
 
             self.display.setText(MathFormatter.to_display(result))
 
@@ -688,9 +689,9 @@ class MainWindow(QMainWindow):
             print(f"Toggle failed: {result}")
 
     def launch_learning_mode(self):
-        if self.operation:
+        if self.operation and not self.is_invalid_result(self.display.text()):
             learning_mode_window = LearningModeWindow(self.operation, self.expression_input.text(),
-                self.display.text(), self.optional_expression_input.text() )
+                self.display.text(), self.optional_expression_input.text(), self.used_vars, self.engine )
             learning_mode_window.exec()
         else:
             QMessageBox.critical(self, "Error", "Learning mode is not available for this operation.")
@@ -785,21 +786,14 @@ class MainWindow(QMainWindow):
         self.autocomplete_widget.hide()
 
     def _find_token_bounds(self, text: str, cursor_pos: int) -> tuple:
-        """Find the start and end positions of the token at cursor position"""
         import re
-
         delimiters = r'[\+\-\*/\(\)\s,=]'
-
-        # Find start of token (go backwards from cursor)
         start = cursor_pos
         while start > 0 and not re.match(delimiters, text[start - 1]):
             start -= 1
-
-        # Find end of token (go forwards from cursor)
         end = cursor_pos
         while end < len(text) and not re.match(delimiters, text[end]):
             end += 1
-
         return start, end
 
     def eventFilter(self, obj, event):
@@ -807,10 +801,7 @@ class MainWindow(QMainWindow):
         if obj in [self.expression_input, self.optional_expression_input]:
             if event.type() == event.Type.KeyPress:
                 if self.autocomplete_widget and self.autocomplete_widget.isVisible():
-                    # nnly intercept specific navigation keys
-                    # all other keys pass through for normal typing
                     key = event.key()
-
                     if key == Qt.Key.Key_Down:
                         self.autocomplete_widget.move_selection_down()
                         return True

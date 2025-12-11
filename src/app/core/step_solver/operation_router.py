@@ -63,7 +63,7 @@ class OperationRouter:
                     'is_final': False
                 },
                 {
-                    'title': 'solve quardratic',
+                    'title': 'solve quardratic result',
                     'expression': str(result),
                     'explanation': 'Solve the equation',
                     'rule': 'solving linear equation',
@@ -94,7 +94,7 @@ class OperationRouter:
                     'is_final': False
                 },
                 {
-                    'title': 'simplified result',
+                    'title': 'simplify result',
                     'expression': str(result),
                     'explanation': 'combined like terms and simplified',
                     'rule': 'simplification',
@@ -339,7 +339,7 @@ class OperationRouter:
                     'is_final': False
                 },
                 {
-                    'title': 'solve 2 equations',
+                    'title': 'solve 2 equations result',
                     'expression': str("".join(i for i in result)),
                     'explanation': 'perform two equations',
                     'rule': 'two linear equation solver',
