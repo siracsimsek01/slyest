@@ -29,7 +29,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("SLYEST - Scientific Calculator")
-        self.setGeometry(100, 100, 800, 900)
+        self.setGeometry(100, 100, 1100, 900)
 
         self.session = SessionManager()
         self.engine = SymbolicEngine()
@@ -80,7 +80,7 @@ class MainWindow(QMainWindow):
         variable_layout = QHBoxLayout(variable_container)
         variable_layout.setSpacing(8)
         var_label = QLabel("Variables:")
-        var_label.setStyleSheet("color: #A0A0A0; font-size: 10pt;")
+        var_label.setStyleSheet("color: #A0A0A0; font-size: 14pt;")
         variable_layout.addWidget(var_label)
 
         self.variable_buttons_layout = QHBoxLayout() # At least 5 variables
@@ -147,15 +147,15 @@ class MainWindow(QMainWindow):
         button_layout.setSpacing(6)
         button_layout.setContentsMargins(0, 5, 0, 5)
 
-        button_layout.addWidget(self.create_new_button("Simplify", "symbolicBtn", lambda: self.handle_symbolic_operation('simplify'))) # Simplify
-        button_layout.addWidget(self.create_new_button("Expand", "symbolicBtn", lambda: self.handle_symbolic_operation('expand'))) # expand
-        button_layout.addWidget(self.create_new_button("Factor", "symbolicBtn", lambda: self.handle_symbolic_operation('factor'))) # factor
-        button_layout.addWidget(self.create_new_button("Solve", "symbolicBtn", lambda: self.handle_symbolic_operation('solve'))) # solve
-        button_layout.addWidget(self.create_new_button("Substitute", "symbolicBtn", lambda: self.handle_symbolic_operation('substitute'))) # substitute
-        button_layout.addWidget(self.create_new_button("Solve 2 Equations", "symbolicBtn", lambda: self.handle_symbolic_operation('solve 2 equations'))) # sovle 2 equations
-        button_layout.addWidget(self.create_new_button("Differentiate", "symbolicBtn", lambda: self.handle_symbolic_operation('differentiate'))) # differentiate
+        button_layout.addWidget(self.create_new_button("Simplify", "symbolicBtn", lambda: self.handle_symbolic_operation('simplify'))) 
+        button_layout.addWidget(self.create_new_button("Expand", "symbolicBtn", lambda: self.handle_symbolic_operation('expand'))) 
+        button_layout.addWidget(self.create_new_button("Factor", "symbolicBtn", lambda: self.handle_symbolic_operation('factor'))) 
+        button_layout.addWidget(self.create_new_button("Solve", "symbolicBtn", lambda: self.handle_symbolic_operation('solve'))) 
+        button_layout.addWidget(self.create_new_button("Substitute", "symbolicBtn", lambda: self.handle_symbolic_operation('substitute'))) 
+        button_layout.addWidget(self.create_new_button("Solve 2 Equations", "symbolicBtn", lambda: self.handle_symbolic_operation('solve 2 equations'))) 
+        button_layout.addWidget(self.create_new_button("Differentiate", "symbolicBtn", lambda: self.handle_symbolic_operation('differentiate'))) 
         button_layout.addWidget(self.create_new_button("Integrate", "symbolicBtn", lambda: self.handle_symbolic_operation('integrate')))
-        button_layout.addWidget(self.create_new_button("Plot", "symbolicBtn", self.open_plotting_panel))  # plot
+        button_layout.addWidget(self.create_new_button("Plot", "symbolicBtn", self.open_plotting_panel))  
         
         parent_layout.addWidget(button_container)
 
