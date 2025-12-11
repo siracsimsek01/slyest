@@ -172,11 +172,11 @@ class MainWindow(QMainWindow):
         button_layout = QHBoxLayout(button_container)
         button_layout.setSpacing(15)
 
-        scientific_grid = self.create_scientific_buttons() # Left column
-        button_layout.addLayout(scientific_grid, 2)  # Takes 2/3 of space
+        scientific_grid = self.create_scientific_buttons() 
+        button_layout.addLayout(scientific_grid, 2)  
 
-        number_grid = self.create_number_pad() # Right column
-        button_layout.addLayout(number_grid, 1)  # Takes 1/3 of space
+        number_grid = self.create_number_pad() 
+        button_layout.addLayout(number_grid, 1)  
         parent_layout.addWidget(button_container)
 
     def create_scientific_buttons(self) -> QGridLayout:
