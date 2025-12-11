@@ -1,5 +1,3 @@
-"""Session management for the application. This file keeps track of all the calculations """
-
 from typing import List, Dict, Any, Optional
 from datetime import datetime
 import sympy as sp
@@ -9,7 +7,6 @@ from reportlab.lib import colors
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
 class HistoryEntry:
-    
     def __init__(self, operation: str, input_expr: str, result: sp.Expr, optional_input_expr=None, timestamp: Optional[datetime] = None, variables: Optional[Dict[str, str]] = None):
         self.operation = operation
         self.input_expr = input_expr
@@ -20,7 +17,6 @@ class HistoryEntry:
         
     
     def to_dict(self) -> Dict[str, Any]:
-        """Turn this entry into a dictionary so we can save it to a file."""
         return {
             'operation': self.operation,
             'input_expr': self.input_expr,
@@ -39,7 +35,7 @@ class HistoryEntry:
             data.get("optional_input_expr"),
             data.get("variables") # Load from JSON
         )
-    
+
     def __str__(self) -> str:
         # Base string
         base = f"[{self.timestamp.strftime('%H:%M:%S')}] {self.operation}: {self.input_expr}"
@@ -83,17 +79,6 @@ class SessionManager:
             return self.export_pdf(name, calculation_list)
         else:
             raise ValueError(f"Unsupported export format: {format}")
-        
-    """def export_text(self, name, calculation_list):
-        os.makedirs("HistoryFiles", exist_ok=True)
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"{name}_{timestamp}.txt"
-        filepath = os.path.join("HistoryFiles", filename)
-
-        with open(filepath, "w", encoding="utf-8") as file:
-            for index, item in enumerate(calculation_list):
-                file.write(str(index + 1) + ". " + item + "\n")
-        return filepath"""
     
     def export_text(self, name, calculation_list):
         filepath = self.create_text_file(name)
