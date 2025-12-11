@@ -32,7 +32,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("SLYEST - Scientific Calculator")
-        self.setGeometry(100, 100, 1100, 900)
+        self.setGeometry(100, 100, 800, 900)
 
         self.session = SessionManager()
         self.engine = SymbolicEngine()
@@ -46,13 +46,7 @@ class MainWindow(QMainWindow):
         self.operation = ""
         self.used_vars = dict()
         self.setStyleSheet(get_calculator_stylesheet())
-
-        # Initialize autocomplete (will be set up after UI)
-        self.autocomplete_manager = None
-        self.autocomplete_widget = None
-
         self.initialise_ui()
-        self.setup_autocomplete()
 
     def _set_formatted_text(self, widget: QLineEdit, text: str):
         widget.setText(MathFormatter.to_display(text))
@@ -66,14 +60,12 @@ class MainWindow(QMainWindow):
         main_layout = QVBoxLayout(central_widget)
         main_layout.setSpacing(10)
         main_layout.setContentsMargins(15, 15, 15, 15)
-
-        self.create_top_bar(main_layout) # contains variables + history toggle
-        self.create_display(main_layout) # display area
-        self.create_history_panel(main_layout) # history panel (initially hidden)
-        self.create_calculator_buttons(main_layout) # main calculator buttons 
+        self.create_top_bar(main_layout)
+        self.create_display(main_layout)
+        self.create_history_panel(main_layout)
+        self.create_calculator_buttons(main_layout)
 
     def create_top_bar(self, parent_layout):
-        """create the top bar with variables and history button."""
         top_bar = QWidget()
         top_bar_layout = QHBoxLayout(top_bar)
         top_bar_layout.setContentsMargins(0, 0, 0, 0)
@@ -83,30 +75,29 @@ class MainWindow(QMainWindow):
         variable_layout = QHBoxLayout(variable_container)
         variable_layout.setSpacing(8)
         var_label = QLabel("Variables:")
-        var_label.setStyleSheet("color: #A0A0A0; font-size: 14pt;")
+        var_label.setStyleSheet("color: #A0A0A0; font-size: 10pt;")
         variable_layout.addWidget(var_label)
 
-        self.variable_buttons_layout = QHBoxLayout() # At least 5 variables
+        self.variable_buttons_layout = QHBoxLayout()
         self.variable_buttons_layout.setSpacing(6)
-        variable_layout.addLayout(self.variable_buttons_layout)
-        self.refresh_variable_display() # initially show none message
+        variable_layout.addLayout(
+            self.variable_buttons_layout)
+        self.refresh_variable_display()
         variable_layout.addStretch()
 
-        variable_layout.addWidget(self.create_new_button("Manage", "manageVarsBtn", self.open_variable_manager)) # Manage variable button
+        variable_layout.addWidget(self.create_new_button("Manage", "manageVarsBtn", self.open_variable_manager))
         top_bar_layout.addWidget(variable_container)
-        top_bar_layout.addWidget(self.create_new_button("History ▼", "historyToggle", self.toggle_history)) # Toggle History button
+        top_bar_layout.addWidget(self.create_new_button("History ▼", "historyToggle", self.toggle_history))
         parent_layout.addWidget(top_bar)
 
     def create_display(self, parent_layout):
-        """create the display area for showing expressions and results."""
-        # expression input field (for typing algebraic expressions like "2x + 5")
         self.expression_input = QLineEdit()
         self.expression_input.setObjectName("expressionInput")
         self.expression_input.setPlaceholderText("Type expression: 2*x + 5, sin(x), x**2...")
 
         self.optional_expression_input = QLineEdit()
         self.optional_expression_input.setObjectName("optionalExpressionInput")
-        self.optional_expression_input.setPlaceholderText("Optional: e.g., x=5, y=3 for substitution <or> x - y = 12 for solving two linear equations, x for differentiation/integration, etc....")
+        self.optional_expression_input.setPlaceholderText("Optional: e.g., x=5, y=3 for substitution <or> x - y = 12 for solving two linear equations....")
 
         self.expression_input.setMinimumHeight(40)
         self.expression_input.returnPressed.connect(self.handle_expression_input)
@@ -150,15 +141,15 @@ class MainWindow(QMainWindow):
         button_layout.setSpacing(6)
         button_layout.setContentsMargins(0, 5, 0, 5)
 
-        button_layout.addWidget(self.create_new_button("Simplify", "symbolicBtn", lambda: self.handle_symbolic_operation('simplify'))) 
-        button_layout.addWidget(self.create_new_button("Expand", "symbolicBtn", lambda: self.handle_symbolic_operation('expand'))) 
-        button_layout.addWidget(self.create_new_button("Factor", "symbolicBtn", lambda: self.handle_symbolic_operation('factor'))) 
-        button_layout.addWidget(self.create_new_button("Solve", "symbolicBtn", lambda: self.handle_symbolic_operation('solve'))) 
-        button_layout.addWidget(self.create_new_button("Substitute", "symbolicBtn", lambda: self.handle_symbolic_operation('substitute'))) 
-        button_layout.addWidget(self.create_new_button("Solve 2 Equations", "symbolicBtn", lambda: self.handle_symbolic_operation('solve 2 equations'))) 
-        button_layout.addWidget(self.create_new_button("Differentiate", "symbolicBtn", lambda: self.handle_symbolic_operation('differentiate'))) 
+        button_layout.addWidget(self.create_new_button("Simplify", "symbolicBtn", lambda: self.handle_symbolic_operation('simplify')))
+        button_layout.addWidget(self.create_new_button("Expand", "symbolicBtn", lambda: self.handle_symbolic_operation('expand')))
+        button_layout.addWidget(self.create_new_button("Factor", "symbolicBtn", lambda: self.handle_symbolic_operation('factor')))
+        button_layout.addWidget(self.create_new_button("Solve", "symbolicBtn", lambda: self.handle_symbolic_operation('solve')))
+        button_layout.addWidget(self.create_new_button("Substitute", "symbolicBtn", lambda: self.handle_symbolic_operation('substitute')))
+        button_layout.addWidget(self.create_new_button("Solve 2 Equations", "symbolicBtn", lambda: self.handle_symbolic_operation('solve 2 equations')))
+        button_layout.addWidget(self.create_new_button("Differentiate", "symbolicBtn", lambda: self.handle_symbolic_operation('differentiate')))
         button_layout.addWidget(self.create_new_button("Integrate", "symbolicBtn", lambda: self.handle_symbolic_operation('integrate')))
-        button_layout.addWidget(self.create_new_button("Plot", "symbolicBtn", self.open_plotting_panel))  
+        button_layout.addWidget(self.create_new_button("Plot", "symbolicBtn", self.open_plotting_panel))
         
         parent_layout.addWidget(button_container)
 
@@ -175,19 +166,17 @@ class MainWindow(QMainWindow):
         button_layout = QHBoxLayout(button_container)
         button_layout.setSpacing(15)
 
-        scientific_grid = self.create_scientific_buttons() 
-        button_layout.addLayout(scientific_grid, 2)  
+        scientific_grid = self.create_scientific_buttons()
+        button_layout.addLayout(scientific_grid, 2)
 
-        number_grid = self.create_number_pad() 
-        button_layout.addLayout(number_grid, 1)  
+        number_grid = self.create_number_pad()
+        button_layout.addLayout(number_grid, 1)
         parent_layout.addWidget(button_container)
 
     def create_scientific_buttons(self) -> QGridLayout:
         """create the left column with scientific function buttons."""
         grid = QGridLayout()
         grid.setSpacing(6)
-
-        # row 0: parentheses and memory
         row0 = [
             ("(", "special"),
             (")", "special"),
@@ -198,14 +187,13 @@ class MainWindow(QMainWindow):
         ]
         for col, (text, btn_type) in enumerate(row0):
             btn = CalculatorButton(text, btn_type)
-            # connect buttons
+            
             if text in ["(", ")"]:
                 btn.clicked.connect(lambda checked=False, t=text: self.handle_parenthesis_click(t))
             elif text in ["mc", "m+", "m-", "mr"]:
                 btn.clicked.connect(lambda checked=False, t=text: self.handle_memory_click(t))
             grid.addWidget(btn, 0, col)
 
-        # row 1: powers and exponentials
         row1 = [
             ("=", "scientific"),
             ("x²", "scientific"),
@@ -219,7 +207,6 @@ class MainWindow(QMainWindow):
             btn.clicked.connect(lambda checked=False, t=text: self.handle_scientific_function_click(t))
             grid.addWidget(btn, 1, col)
 
-        # row 2: roots and logarithms
         row2 = [
             ("1/x", "scientific"),
             ("²√x", "scientific"),
@@ -240,7 +227,6 @@ class MainWindow(QMainWindow):
                 btn.clicked.connect(lambda checked=False, t=text: self.handle_scientific_function_click(t))
             grid.addWidget(btn, 2, col)
 
-        # Row 3: trigonometry and constants
         row3 = [
             ("x!", "scientific"),
             ("sin", "scientific"),
@@ -257,7 +243,6 @@ class MainWindow(QMainWindow):
                 btn.clicked.connect(lambda checked=False, t=text: self.handle_scientific_function_click(t))
             grid.addWidget(btn, 3, col)
 
-        # Row 4: hyperbolic and special symbols
         row4 = [
             ("S<=>D", "scientific"),
             ("sinh", "scientific"),
@@ -285,7 +270,6 @@ class MainWindow(QMainWindow):
         grid = QGridLayout()
         grid.setSpacing(6)
 
-        # Row 0: AC, ←, %, ÷
         row0 = [
             ("AC", "special"),
             ("←", "special"),
@@ -302,7 +286,6 @@ class MainWindow(QMainWindow):
                 btn.clicked.connect(lambda checked=False, t=text: self.handle_operation_click(t))
             grid.addWidget(btn, 0, col)
 
-        # Row 1: 7, 8, 9, ×
         row1 = [
             ("7", "number"),
             ("8", "number"),
@@ -317,7 +300,6 @@ class MainWindow(QMainWindow):
                 btn.clicked.connect(lambda checked=False, t=text: self.handle_operation_click(t))
             grid.addWidget(btn, 1, col)
 
-        # Row 2: 4, 5, 6, -
         row2 = [
             ("4", "number"),
             ("5", "number"),
@@ -332,7 +314,6 @@ class MainWindow(QMainWindow):
                 btn.clicked.connect(lambda checked=False, t=text: self.handle_operation_click(t))
             grid.addWidget(btn, 2, col)
 
-        # Row 3: 1, 2, 3, +
         row3 = [
             ("1", "number"),
             ("2", "number"),
@@ -347,7 +328,6 @@ class MainWindow(QMainWindow):
                 btn.clicked.connect(lambda checked=False, t=text: self.handle_operation_click(t))
             grid.addWidget(btn, 3, col)
 
-        # Row 4: 0 (span 2 cols), ., =
         btn_0 = CalculatorButton("0", "number")
         btn_0.clicked.connect(lambda: self.handle_number_click("0"))
         btn_0.setMinimumWidth(128)
@@ -380,12 +360,12 @@ class MainWindow(QMainWindow):
             no_vars.setStyleSheet("color: #A0A0A0; font-size: 10pt; font-style: italic;")
             self.variable_buttons_layout.addWidget(no_vars)
         else: 
-            var_items = list(variables.items())[-5:] # Show most recent 5 variables
+            var_items = list(variables.items())[-5:]
             for name, value in var_items:
                 btn = QPushButton(f"{name}")
                 btn.setObjectName("variableChip")
                 btn.setToolTip(f"{name} = {value}")
-                btn.clicked.connect(lambda *, n=name: self.insert_variable(n)) # Use lambda with captured variable to avoid late binding issue
+                btn.clicked.connect(lambda *, n=name: self.insert_variable(n))
                 self.variable_buttons_layout.addWidget(btn)
 
     def insert_variable(self, var_name: str):
@@ -458,8 +438,7 @@ class MainWindow(QMainWindow):
             expression, answer = result
             self._set_formatted_text(self.expression_input, expression)
             self.display.setText(MathFormatter.to_display(answer))
-            if not "Error" in result:
-                self.history_panel.add_calculation(expression, answer)
+            self.history_panel.add_calculation(expression, answer)
 
     def handle_clear_click(self):
         result = self.operations.clear_all()
@@ -655,7 +634,7 @@ class MainWindow(QMainWindow):
             elif operation == 'differentiate':
                 result = str(self.engine.differentiate(expression_string_processed, optional_expression_string_processed))
             elif operation == 'integrate':
-                result = str(self.engine.integrate(expression_string_processed, optional_expression_string_processed))
+                result = str(self.engine.integrate(expression_string, optional_expression_string))
 
             self.display.setText(MathFormatter.to_display(result))
 
@@ -706,9 +685,9 @@ class MainWindow(QMainWindow):
             print(f"Toggle failed: {result}")
 
     def launch_learning_mode(self):
-        if self.operation and not self.is_invalid_result(self.display.text()):
+        if self.operation:
             learning_mode_window = LearningModeWindow(self.operation, self.expression_input.text(),
-                self.display.text(), self.optional_expression_input.text(), self.used_vars, self.engine )
+                self.display.text(), self.optional_expression_input.text() )
             learning_mode_window.exec()
         else:
             QMessageBox.critical(self, "Error", "Learning mode is not available for this operation.")
@@ -719,8 +698,8 @@ class MainWindow(QMainWindow):
     def open_plotting_panel(self):
         self.plotting_dialog = QDialog(self)
         self.plotting_dialog.setWindowTitle("SLYEST - Plotting")
-        self.plotting_dialog.resize(600, 300)
-
+        self.plotting_dialog.resize(900, 700)
+        
         layout = QVBoxLayout()
 
         self.plotting_panel_instance = PlottingPanel(
@@ -729,7 +708,7 @@ class MainWindow(QMainWindow):
         )
         self.plotting_panel_instance.update_variables(self.engine.list_variables())
         layout.addWidget(self.plotting_panel_instance)
-
+        
         self.plotting_dialog.setLayout(layout)
         self.plotting_dialog.exec()
 
