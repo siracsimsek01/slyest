@@ -717,7 +717,7 @@ class MainWindow(QMainWindow):
 
         self.plotting_dialog = QDialog(self)
         self.plotting_dialog.setWindowTitle("SLYEST - Plotting")
-        self.plotting_dialog.resize(900, 700)
+        self.plotting_dialog.resize(600, 300)
 
         layout = QVBoxLayout()
 

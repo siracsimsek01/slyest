@@ -2,6 +2,99 @@ from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel,
                              QLineEdit, QPushButton, QGroupBox,
                              QDialog, QTextEdit, QMessageBox)
 
+
+PANEL_STYLE = """
+    QGroupBox {
+        border: 2px solid #444;
+        border-radius: 8px;
+        margin-top: 10px;
+        padding: 15px;
+        font-weight: bold;
+        color: #FFA500;
+    }
+    QGroupBox::title {
+        subcontrol-origin: margin;
+        left: 10px;
+        padding: 0 5px;
+    }
+    QLabel {
+        color: #CCCCCC;
+        font-size: 11pt;
+    }
+    QLineEdit {
+        background-color: #2B2B2B;
+        color: #FFFFFF;
+        border: 2px solid #444;
+        border-radius: 5px;
+        padding: 5px;
+        font-size: 11pt;
+    }
+    QLineEdit:focus {
+        border: 2px solid #FFA500;
+    }
+    QPushButton {
+        background-color: #FFA500;
+        color: #FFFFFF;
+        border: none;
+        border-radius: 5px;
+        padding: 8px 15px;
+        font-size: 11pt;
+        font-weight: bold;
+    }
+    QPushButton:hover {
+        background-color: #FFB733;
+    }
+    QPushButton:pressed {
+        background-color: #CC8400;
+    }
+"""
+
+DIALOG_STYLE = """
+    QDialog {
+        background-color: #1E1E1E;
+    }
+    QLabel {
+        color: #CCCCCC;
+        font-size: 11pt;
+    }
+    QLineEdit {
+        background-color: #2B2B2B;
+        color: #FFFFFF;
+        border: 2px solid #444;
+        border-radius: 5px;
+        padding: 5px;
+        font-size: 11pt;
+    }
+    QLineEdit:focus {
+        border: 2px solid #FFA500;
+    }
+    QTextEdit {
+        background-color: #2B2B2B;
+        color: #FFFFFF;
+        border: 2px solid #444;
+        border-radius: 5px;
+        font-size: 11pt;
+        font-family: 'Consolas', 'Courier New', monospace;
+    }
+    QPushButton {
+        background-color: #FFA500;
+        color: #FFFFFF;
+        border: none;
+        border-radius: 5px;
+        padding: 8px 15px;
+        font-size: 11pt;
+        font-weight: bold;
+        min-width: 80px;
+    }
+    QPushButton:hover {
+        background-color: #FFB733;
+    }
+    QPushButton:pressed {
+        background-color: #CC8400;
+    }
+"""
+
+
 class PlottingPanel(QWidget):
     
     def __init__(self, application_reference, parent=None):
@@ -12,73 +105,8 @@ class PlottingPanel(QWidget):
         self.plotter = ExpressionPlotter()
         self.window_manager = PlotWindowManager()
         
-        self.variable_input = None
-        self.x_min_input = None
-        self.x_max_input = None
-        
         self._build_interface()
-
-    def _apply_styling(self):
-        self.setStyleSheet("""
-            QGroupBox {
-                border: 2px solid #444;
-                border-radius: 8px;
-                margin-top: 10px;
-                padding: 15px;
-                font-weight: bold;
-                color: #FFA500;
-            }
-            QGroupBox::title {
-                subcontrol-origin: margin;
-                left: 10px;
-                padding: 0 5px;
-            }
-            QLabel {
-                color: #CCCCCC;
-                font-size: 11pt;
-            }
-            QLineEdit {
-                background-color: #2B2B2B;
-                color: #FFFFFF;
-                border: 2px solid #444;
-                border-radius: 5px;
-                padding: 5px;
-                font-size: 11pt;
-            }
-            QLineEdit:focus {
-                border: 2px solid #FFA500;
-            }
-            QPushButton {
-                background-color: #FFA500;
-                color: #000000;
-                border: none;
-                border-radius: 5px;
-                padding: 8px 15px;
-                font-size: 11pt;
-                font-weight: bold;
-            }
-            QPushButton:hover {
-                background-color: #FFB733;
-            }
-            QPushButton:pressed {
-                background-color: #CC8400;
-            }
-            QCheckBox {
-                color: #CCCCCC;
-                font-size: 10pt;
-            }
-            QCheckBox::indicator {
-                width: 18px;
-                height: 18px;
-                border: 2px solid #444;
-                border-radius: 3px;
-                background-color: #2B2B2B;
-            }
-            QCheckBox::indicator:checked {
-                background-color: #FFA500;
-                border-color: #FFA500;
-            }
-        """)
+        self.setStyleSheet(PANEL_STYLE)
     
     def _build_interface(self):
         main_layout = QVBoxLayout()
@@ -91,8 +119,6 @@ class PlottingPanel(QWidget):
         group_box.setLayout(group_layout)
         main_layout.addWidget(group_box)
         self.setLayout(main_layout)
-
-        self._apply_styling()
     
     def _create_range_controls(self):
         layout = QHBoxLayout()
@@ -121,33 +147,33 @@ class PlottingPanel(QWidget):
     def _create_action_buttons(self):
         layout = QHBoxLayout()
         
-        plot_button = QPushButton("Plot Expression")
-        plot_button.clicked.connect(self.plot_single)
-        layout.addWidget(plot_button)
-        
-        multiple_button = QPushButton("Plot Multiple")
-        multiple_button.clicked.connect(self.plot_multiple)
-        layout.addWidget(multiple_button)
-        
-        parametric_button = QPushButton("Parametric Plot")
-        parametric_button.clicked.connect(self.plot_parametric)
-        layout.addWidget(parametric_button)
+        layout.addWidget(self._create_button("Plot Expression", self.plot_single))
+        layout.addWidget(self._create_button("Plot Multiple", self.plot_multiple))
+        layout.addWidget(self._create_button("Parametric Plot", self.plot_parametric))
         
         layout.addStretch()
         return layout
     
+    def _create_button(self, text, handler):
+        button = QPushButton(text)
+        button.clicked.connect(handler)
+        return button
+    
     def update_variables(self, variables_dict):
         self.plotter.set_variables(variables_dict)
+    
+    def _sync_variables(self):
+        if hasattr(self.app, 'engine') and hasattr(self.app.engine, 'list_variables'):
+            self.plotter.set_variables(self.app.engine.list_variables())
     
     def plot_single(self):
         expression = self._get_expression()
         if not expression:
             QMessageBox.warning(self, "Warning", "Please enter an expression")
             return
-    
-        if hasattr(self.app, 'engine') and hasattr(self.app.engine, 'list_variables'):
-            self.plotter.set_variables(self.app.engine.list_variables())
-    
+        
+        self._sync_variables()
+        
         try:
             params = self._get_parameters()
             figure = self.plotter.create_plot(
@@ -161,16 +187,12 @@ class PlottingPanel(QWidget):
             QMessageBox.critical(self, "Error", str(e))
     
     def plot_multiple(self):
-        if hasattr(self.app, 'engine') and hasattr(self.app.engine, 'list_variables'):
-            self.plotter.set_variables(self.app.engine.list_variables())
-    
+        self._sync_variables()
         dialog = MultipleExpressionDialog(self, self.plotter, self.window_manager, self._get_parameters)
         dialog.exec()
 
     def plot_parametric(self):
-        if hasattr(self.app, 'engine') and hasattr(self.app.engine, 'list_variables'):
-            self.plotter.set_variables(self.app.engine.list_variables())
-    
+        self._sync_variables()
         dialog = ParametricPlotDialog(self, self.plotter, self.window_manager, self._get_parameters)
         dialog.exec()
     
@@ -200,41 +222,11 @@ class MultipleExpressionDialog(QDialog):
         
         self.setWindowTitle("Plot Multiple Expressions")
         self.resize(500, 400)
-
-        self.setStyleSheet("""
-            QDialog {
-                background-color: #1E1E1E;
-            }
-            QLabel {
-                color: #CCCCCC;
-                font-size: 11pt;
-            }
-            QTextEdit {
-                background-color: #2B2B2B;
-                color: #FFFFFF;
-                border: 2px solid #444;
-                border-radius: 5px;
-                font-size: 11pt;
-                font-family: 'Consolas', 'Courier New', monospace;
-            }
-            QPushButton {
-                background-color: #FFA500;
-                color: #000000;
-                border: none;
-                border-radius: 5px;
-                padding: 8px 15px;
-                font-size: 11pt;
-                font-weight: bold;
-                min-width: 80px;
-            }
-            QPushButton:hover {
-                background-color: #FFB733;
-            }
-            QPushButton:pressed {
-                background-color: #CC8400;
-            }
-        """)
+        self.setStyleSheet(DIALOG_STYLE)
         
+        self._build_interface()
+    
+    def _build_interface(self):
         layout = QVBoxLayout()
         layout.addWidget(QLabel("Enter expressions (one per line):"))
         
@@ -242,18 +234,22 @@ class MultipleExpressionDialog(QDialog):
         self.text_input.setPlainText("x**2\nx**3\nsin(x)")
         layout.addWidget(self.text_input)
         
-        button_layout = QHBoxLayout()
-        plot_button = QPushButton("Plot")
-        plot_button.clicked.connect(self._execute_plot)
-        button_layout.addWidget(plot_button)
-        
-        cancel_button = QPushButton("Cancel")
-        cancel_button.clicked.connect(self.reject)
-        button_layout.addWidget(cancel_button)
-        button_layout.addStretch()
-        
-        layout.addLayout(button_layout)
+        layout.addLayout(self._create_buttons())
         self.setLayout(layout)
+    
+    def _create_buttons(self):
+        layout = QHBoxLayout()
+        
+        layout.addWidget(self._create_button("Plot", self._execute_plot))
+        layout.addWidget(self._create_button("Cancel", self.reject))
+        
+        layout.addStretch()
+        return layout
+    
+    def _create_button(self, text, handler):
+        button = QPushButton(text)
+        button.clicked.connect(handler)
+        return button
     
     def _execute_plot(self):
         text = self.text_input.toPlainText().strip()
@@ -287,56 +283,38 @@ class ParametricPlotDialog(QDialog):
         
         self.setWindowTitle("Parametric Plot")
         self.resize(450, 250)
+        self.setStyleSheet(DIALOG_STYLE)
         
-        self.setStyleSheet("""
-            QDialog {
-                background-color: #1E1E1E;
-            }
-            QLabel {
-                color: #CCCCCC;
-                font-size: 11pt;
-            }
-            QLineEdit {
-                background-color: #2B2B2B;
-                color: #FFFFFF;
-                border: 2px solid #444;
-                border-radius: 5px;
-                padding: 5px;
-                font-size: 11pt;
-            }
-            QLineEdit:focus {
-                border: 2px solid #FFA500;
-            }
-            QPushButton {
-                background-color: #FFA500;
-                color: #000000;
-                border: none;
-                border-radius: 5px;
-                padding: 8px 15px;
-                font-size: 11pt;
-                font-weight: bold;
-                min-width: 80px;
-            }
-            QPushButton:hover {
-                background-color: #FFB733;
-            }
-            QPushButton:pressed {
-                background-color: #CC8400;
-            }
-        """)
+        self._build_interface()
+    
+    def _build_interface(self):
         layout = QVBoxLayout()
+        
+        layout.addLayout(self._create_expression_inputs())
+        layout.addLayout(self._create_parameter_controls())
+        layout.addLayout(self._create_buttons())
+        
+        self.setLayout(layout)
+    
+    def _create_expression_inputs(self):
+        container = QVBoxLayout()
         
         x_layout = QHBoxLayout()
         x_layout.addWidget(QLabel("X Expression:"))
         self.x_input = QLineEdit("cos(t)")
         x_layout.addWidget(self.x_input)
-        layout.addLayout(x_layout)
+        container.addLayout(x_layout)
         
         y_layout = QHBoxLayout()
         y_layout.addWidget(QLabel("Y Expression:"))
         self.y_input = QLineEdit("sin(t)")
         y_layout.addWidget(self.y_input)
-        layout.addLayout(y_layout)
+        container.addLayout(y_layout)
+        
+        return container
+    
+    def _create_parameter_controls(self):
+        container = QVBoxLayout()
         
         param_layout = QHBoxLayout()
         param_layout.addWidget(QLabel("Parameter:"))
@@ -344,7 +322,7 @@ class ParametricPlotDialog(QDialog):
         self.param_input.setMaximumWidth(50)
         param_layout.addWidget(self.param_input)
         param_layout.addStretch()
-        layout.addLayout(param_layout)
+        container.addLayout(param_layout)
         
         range_layout = QHBoxLayout()
         range_layout.addWidget(QLabel("Parameter Range:"))
@@ -356,20 +334,23 @@ class ParametricPlotDialog(QDialog):
         self.max_input.setMaximumWidth(80)
         range_layout.addWidget(self.max_input)
         range_layout.addStretch()
-        layout.addLayout(range_layout)
+        container.addLayout(range_layout)
         
-        button_layout = QHBoxLayout()
-        plot_button = QPushButton("Plot")
-        plot_button.clicked.connect(self._execute_plot)
-        button_layout.addWidget(plot_button)
+        return container
+    
+    def _create_buttons(self):
+        layout = QHBoxLayout()
         
-        cancel_button = QPushButton("Cancel")
-        cancel_button.clicked.connect(self.reject)
-        button_layout.addWidget(cancel_button)
-        button_layout.addStretch()
+        layout.addWidget(self._create_button("Plot", self._execute_plot))
+        layout.addWidget(self._create_button("Cancel", self.reject))
         
-        layout.addLayout(button_layout)
-        self.setLayout(layout)
+        layout.addStretch()
+        return layout
+    
+    def _create_button(self, text, handler):
+        button = QPushButton(text)
+        button.clicked.connect(handler)
+        return button
     
     def _execute_plot(self):
         try:
