@@ -33,6 +33,7 @@ class MathFormatter:
         result = cls._convert_superscripts_to_power(result)
         result = result.replace('×', '*')
         result = result.replace('÷', '/')
+        result = cls._show_implicit_multiplication(result)
         result = cls._convert_functions_back(result)
 
         return result
@@ -71,25 +72,24 @@ class MathFormatter:
     @classmethod
     def _hide_implicit_multiplication(cls, text: str) -> str:
         
-        text = re.sub(r'(\d+)\*([a-zA-Z])', r'\1\2', text)
-
-        
-        text = re.sub(r'([a-zA-Z])\*([a-zA-Z])', r'\1\2', text)
-
-        
-        text = re.sub(r'(\d+)\*\(', r'\1(', text)
-
-        
-        text = re.sub(r'\)\*(\d+)', r')\1', text)
-
-        
-        text = re.sub(r'\)\*([a-zA-Z])', r')\1', text)
-
-        
+        text = re.sub(r'(\d+)\*([a-zA-Z])', r'\1\2', text)     
+        text = re.sub(r'([a-zA-Z])\*([a-zA-Z])', r'\1\2', text)        
+        text = re.sub(r'(\d+)\*\(', r'\1(', text)       
+        text = re.sub(r'\)\*(\d+)', r')\1', text)       
+        text = re.sub(r'\)\*([a-zA-Z])', r')\1', text)        
         text = re.sub(r'([a-zA-Z])\*\(', r'\1(', text)
-        
         text = re.sub(r'\)\*\(', r')(', text)
+        return text
 
+    @classmethod
+    def _show_implicit_multiplication(cls, text: str) -> str:
+
+        text = re.sub(r'(\d)([a-zA-Z])', r'\1*\2', text)
+        text = re.sub(r'([a-zA-Z])([A-Z])(?![a-z])', r'\1*\2', text)
+        text = re.sub(r'(?<![a-zA-Z])([a-zA-Z])\(', r'\1*(', text)
+        text = re.sub(r'\)(\d)', r')*\1', text)
+        text = re.sub(r'\)([a-zA-Z])', r')*\1', text)
+        text = re.sub(r'\)\(', r')*(', text)
         return text
 
     @classmethod

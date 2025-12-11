@@ -20,6 +20,7 @@ class OperationRouter:
     def generate_steps(self, operation: str, input_expr: str, optional_input: str = "", result="") -> Dict:
         if operation == "solve":
             if ", " in result:
+                operation = "solve quadratic"
                 result = self._solve_2_answer_steps(input_expr, result)
             else:
                 result = self._solve_steps(input_expr, result)
@@ -62,7 +63,7 @@ class OperationRouter:
                     'is_final': False
                 },
                 {
-                    'title': 'Solved result',
+                    'title': 'solve quardratic',
                     'expression': str(result),
                     'explanation': 'Solve the equation',
                     'rule': 'solving linear equation',
@@ -244,7 +245,7 @@ class OperationRouter:
                     'is_final': False
                 },
                 {
-                    'title': 'derivative',
+                    'title': 'differentiate',
                     'expression': f"f'({variable}) = {result}",
                     'explanation': 'applied differentiation rules',
                     'rule': 'differentiation',
@@ -276,7 +277,7 @@ class OperationRouter:
                     'is_final': False
                 },
                 {
-                    'title': 'integration',
+                    'title': 'integrate',
                     'expression': f"∫f({variable}) = {result}",
                     'explanation': 'applied integration rules',
                     'rule': 'integration',
@@ -300,14 +301,14 @@ class OperationRouter:
         try:
             steps = [
                 {
-                    'title': 'substitution',
+                    'title': 'given equation',
                     'expression': f'{expr} with {substitution}',
                     'explanation': f'substitute values: {substitution}',
                     'rule': 'substitution',
                     'is_final': False
                 },
                 {
-                    'title': 'substitution result',
+                    'title': 'substituted result',
                     'expression': str(result),
                     'explanation': f'substitue {substitution} into the expression',
                     'rule': 'subsitution',
@@ -331,14 +332,14 @@ class OperationRouter:
         try:
             steps = [
                 {
-                    'title': 'two linear equations',
+                    'title': 'given equation',
                     'expression': f'{eq1} , {eq2}',
                     'explanation': 'solving system of two linear equations',
                     'rule': 'starting point',
                     'is_final': False
                 },
                 {
-                    'title': 'simplified result',
+                    'title': 'solve 2 equations',
                     'expression': str("".join(i for i in result)),
                     'explanation': 'perform two equations',
                     'rule': 'two linear equation solver',

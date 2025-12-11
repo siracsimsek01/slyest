@@ -108,6 +108,24 @@ class ExplanationEnhancer:
                 return (f"We have the function {expr}. Differentiation finds the rate of change - how the "
                        f"output changes as the input changes. The derivative tells us the slope of the tangent "
                        f"line at any point on the function's graph.")
+            if op == "integrate":
+                return (f"We are working with the expression {expr}. Integration is the reverse of differentiation — "
+                        f"it finds the accumulated area under the curve of a function. "
+                        f"By integrating, we determine a new function whose derivative gives us the original expression.")
+            if op == "substitute":
+                return (f"We start with the expression {expr}. Substitution means replacing the variable with a "
+                        f"specific value. This allows us to compute the numerical result of the expression "
+                        f"when the variable is set to that value.")
+            if op == "solve 2 equations":
+                return (f"We are working with the system {expr}. Solving two equations with two unknowns means finding "
+                        f"the values of the variables that satisfy *both* equations at the same time. "
+                        f"This is done by eliminating one variable or substituting one equation into the other. "
+                        f"The solution gives the point where the two equations intersect.")
+            if op == "solve quadratic":
+                return (f"We are solving the quadratic equation {expr}. A quadratic equation can have up to two "
+                        f"solutions because it is based on a squared term. These solutions come from the quadratic "
+                        f"formula, factoring, or completing the square. Both solutions are valid as long as they "
+                        f"satisfy the original equation.")
             return f"Starting from {expr}, we'll work through this step-by-step."
 
         if "identify" in title:
@@ -201,6 +219,16 @@ class ExplanationEnhancer:
                 return "💡 Tip: Use FOIL (First, Outer, Inner, Last) for binomial multiplication, or distribute systematically term by term."
             if op == "factor":
                 return "💡 Tip: Look for common factors first, then check for special patterns like x² - y² or perfect squares."
+            if op == "substitute":
+                return "💡 Tip: Replace the variable with the given value carefully, then simplify step by step to avoid mistakes."
+            if op == "differentiate":
+                return "💡 Tip: Apply the power rule, product rule, or chain rule as needed. Focus on how each term changes with respect to x."
+            if op == "integrate":
+                return "💡 Tip: Look for functions you recognize as derivatives of something simpler. Reverse the differentiation rules to find the antiderivative."
+            if op == "solve quadratic":
+                return "💡 Tip: Set the equation equal to zero. Check whether factoring works; if not, use the quadratic formula."
+            if op == "solve 2 equations":
+                return "💡 Tip: Try eliminating one variable or substitute one equation into the other. Make both equations share only one unknown at a time."
 
         if "simplify" in title or "combine" in rule.lower():
             return "💡 Tip: Only combine like terms! Terms must have identical variable parts (including powers) to be combined."
@@ -242,7 +270,15 @@ class ExplanationEnhancer:
 
         if "calculate" in title and ("+" in expr or "-" in expr or "*" in expr or "/" in expr):
             return "⚠️ Common Mistake: Follow the order of operations (PEMDAS/BODMAS)! Don't just work left to right."
+        
+        if "substitute" in title:
+            return "⚠️ Common Mistake: Make sure to substitute the value into every instance of the variable. Forgetting some occurrences leads to incorrect results."
 
+        if "differentiate" in title:
+            return "⚠️ Common Mistake: Remember to apply all derivative rules properly (product, quotient, chain). Missing a rule often causes wrong answers."
+
+        if "integrate" in title:
+            return "⚠️ Common Mistake: Don’t forget the constant of integration when finding indefinite integrals. Also, be careful with substitution and variable changes."
         return None
 
     def _generate_follow_up(self, title: str, context: Dict) -> Optional[str]:

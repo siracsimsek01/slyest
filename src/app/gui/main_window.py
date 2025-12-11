@@ -103,7 +103,7 @@ class MainWindow(QMainWindow):
 
         self.optional_expression_input = QLineEdit()
         self.optional_expression_input.setObjectName("optionalExpressionInput")
-        self.optional_expression_input.setPlaceholderText("Optional: e.g., x=5, y=3 for substitution <or> x - y = 12 for solving two linear equations....")
+        self.optional_expression_input.setPlaceholderText("Optional: e.g., x=5, y=3 for substitution <or> x - y = 12 for solving two linear equations, x for differentiation/integration, etc....")
 
         self.expression_input.setMinimumHeight(40)
         self.expression_input.returnPressed.connect(self.handle_expression_input)
@@ -455,7 +455,8 @@ class MainWindow(QMainWindow):
             expression, answer = result
             self._set_formatted_text(self.expression_input, expression)
             self.display.setText(MathFormatter.to_display(answer))
-            self.history_panel.add_calculation(expression, answer)
+            if not "Error" in result:
+                self.history_panel.add_calculation(expression, answer)
 
     def handle_clear_click(self):
         result = self.operations.clear_all()
