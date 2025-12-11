@@ -9,6 +9,7 @@ from sympy.parsing.sympy_parser import (
     standard_transformations,
     implicit_multiplication_application
 )
+from src.app.core.math_formatter import MathFormatter
 
 class ExpressionPlotter:
 
@@ -54,6 +55,7 @@ class ExpressionPlotter:
         num_points: int = None,
         substitute_vars: bool = True
     ) -> Figure:
+        formatted_expr = MathFormatter.to_display(expr)
         try:
             expr = self._parse(expr)
             if substitute_vars:
@@ -82,7 +84,7 @@ class ExpressionPlotter:
             ax.plot(xs, ys, label=str(expr), linewidth=2)
             ax.set_xlabel(variable, fontsize=12)
             ax.set_ylabel(f"f({variable})", fontsize=12)
-            ax.set_title(title or f"Plot of {expr}", fontsize=14)
+            ax.set_title(title or f"Plot of {formatted_expr}", fontsize=14)
             ax.grid(True, alpha=0.3)
             ax.legend(fontsize=10)
             ax.axhline(y=0, color='k', linewidth=0.5)

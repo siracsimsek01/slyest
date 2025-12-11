@@ -5,16 +5,18 @@ from ..core.step_solver.operation_router import OperationRouter
 from ..core.math_formatter import MathFormatter
 
 class LearningModeWindow(QDialog):
-    def __init__(self, operation, input_expression, result, optional_input, parent=None):
+    def __init__(self, operation, input_expression, result, optional_input, variables, engine, parent=None):
         super().__init__(parent)
         self.apply_stylesheet()
         self.setWindowTitle("Learning Mode")
-        self.setGeometry(400, 300, 800, 600)
+        self.setGeometry(400, 200, 800, 600)
         self.operation = operation
         self.input_expression = input_expression
         self.result = result
         self.optional_input = optional_input
+        self.variables = variables
         self.router = OperationRouter()
+        self.engine = engine;
         self.steps_data = self.generate_steps()
         self.initialise_ui()
         
@@ -62,7 +64,16 @@ class LearningModeWindow(QDialog):
     def generate_steps(self):
         internal_input = MathFormatter.to_internal(self.input_expression)
         internal_optional = MathFormatter.to_internal(self.optional_input)
-        return self.router.generate_steps(self.operation, internal_input, internal_optional)
+        if self.variables:
+            internal_input = self.replace_variables(self.variables, internal_input)
+            if self.optional_input:
+                internal_optional = self.replace_variables(self.variables, internal_optional)
+        return self.router.generate_steps(self.operation, internal_input, internal_optional, self.result)
+
+    def replace_variables(self, variables, expression):
+        for name, value in variables.items():
+            expression = expression.replace(name, f"({value})")
+        return expression
 
     def format_steps(self):
         if not self.steps_data.get('success', False):
@@ -324,6 +335,9 @@ class LearningModeWindow(QDialog):
 
         if self.optional_input:
             window_layout.addLayout(self.create_info_row("Optional Input:", self.optional_input))
+        
+        if self.variables:
+            window_layout.addLayout(self.create_info_row("Variables:", ", ".join([f"{k} = {v}" for k, v in self.variables.items()])))
 
         window_layout.addLayout(self.create_info_row("Answer:", self.result))
 

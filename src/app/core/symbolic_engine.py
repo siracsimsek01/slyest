@@ -116,10 +116,10 @@ class SymbolicEngine:
                 var = Symbol(optional_expression_input)
                 return sp.integrate(sympy_expr, var)
 
-            return "Enter only one variable to integrate with respect to (e.g., 'x')."
+            return "Error: Enter only one variable."
 
         except Exception as e:
-            return f"Integration error: {str(e)}"
+            return f"Integration Error: {str(e)}"
         
             
     def _infer_variable(self, sympy_expr):
@@ -141,7 +141,8 @@ class SymbolicEngine:
             var = Symbol(optional_expression_input)
             return diff(expr, var)
         else:
-            return "Enter only one variable."   
+            return "Error: Enter only one variable."
+    
     def find_symbol(self, expr):
          for char in expr:
             if char.isalpha():

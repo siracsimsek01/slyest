@@ -651,7 +651,7 @@ class MainWindow(QMainWindow):
             elif operation == 'differentiate':
                 result = str(self.engine.differentiate(expression_string_processed, optional_expression_string_processed))
             elif operation == 'integrate':
-                result = str(self.engine.integrate(expression_string, optional_expression_string))
+                result = str(self.engine.integrate(expression_string_processed, optional_expression_string_processed))
 
             self.display.setText(MathFormatter.to_display(result))
 
@@ -702,9 +702,9 @@ class MainWindow(QMainWindow):
             print(f"Toggle failed: {result}")
 
     def launch_learning_mode(self):
-        if self.operation:
+        if self.operation and not self.is_invalid_result(self.display.text()):
             learning_mode_window = LearningModeWindow(self.operation, self.expression_input.text(),
-                self.display.text(), self.optional_expression_input.text() )
+                self.display.text(), self.optional_expression_input.text(), self.used_vars, self.engine )
             learning_mode_window.exec()
         else:
             QMessageBox.critical(self, "Error", "Learning mode is not available for this operation.")
@@ -727,6 +727,9 @@ class MainWindow(QMainWindow):
 
         self.plotting_dialog.setLayout(layout)
         self.plotting_dialog.show()
+
+    def is_invalid_result(self, result):
+        return "Error" in result or "Invalid" in result
 
     def setup_autocomplete(self):
         self.autocomplete_manager = AutocompleteManager(self.engine, self.history_panel)

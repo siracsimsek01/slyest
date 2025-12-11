@@ -7,7 +7,7 @@ class LinearEquationSolver:
     def __init__(self):
         self.steps = []
         
-    def solve_with_steps(self, equation_str: str) -> Dict:
+    def solve_with_steps(self, equation_str: str, result: str) -> Dict:
         self.steps = []
         
         try:
@@ -111,7 +111,7 @@ class LinearEquationSolver:
                 new_rhs = rhs - constant_sum
                 
                 self._add_step(
-                    title=f"subtract {constant_sum} from both sides",
+                    title=f"subtract {constant_sum} from both sides" if constant_sum > 0 else f"add {str(constant_sum)[1:]} to both sides",
                     expression_left=str(simplify(new_lhs)),
                     expression_right=str(simplify(new_rhs)),
                     explanation=f"remove constant term to isolate terms with {var}",
@@ -135,7 +135,7 @@ class LinearEquationSolver:
                     new_rhs = rhs - var_sum
                     
                     self._add_step(
-                        title=f"subtract {var_sum} from both sides",
+                        title=f"subtract {var_sum} from both sides" if var_sum > 0 else f"add {str(var_sum)[1:]} to both sides",
                         expression_left=str(simplify(new_lhs)),
                         expression_right=str(simplify(new_rhs)),
                         explanation=f"move all {var} terms to left side",

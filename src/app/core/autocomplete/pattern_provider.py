@@ -22,7 +22,7 @@ class PatternProvider:
             patterns_file = Path(__file__).parent / "patterns.json"
 
         try:
-            with open(patterns_file, 'r') as f:
+            with open(patterns_file, 'r', encoding='utf8') as f:
                 self.patterns = json.load(f)
         except FileNotFoundError:
             print(f"Warning: {patterns_file} not found. Pattern suggestions disabled.")

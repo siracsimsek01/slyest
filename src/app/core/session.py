@@ -5,6 +5,7 @@ import os
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
 from reportlab.pdfbase.pdfmetrics import stringWidth
+from .math_formatter import MathFormatter
 
 class HistoryEntry:
     def __init__(self, operation: str, input_expr: str, result: sp.Expr, optional_input_expr=None, timestamp: Optional[datetime] = None, variables: Optional[Dict[str, str]] = None):
@@ -49,7 +50,7 @@ class HistoryEntry:
             vars_str = ", ".join([f"{k} = {v}" for k, v in self.variables.items()])
             base += f" [ {vars_str} ]"
             
-        return base
+        return MathFormatter.to_display(base)
 class SessionManager:
     def __init__(self, max_history: int = 100):
         self.history: List[HistoryEntry] = []
