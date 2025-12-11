@@ -46,7 +46,10 @@ class MainWindow(QMainWindow):
         self.operation = ""
         self.used_vars = dict()
         self.setStyleSheet(get_calculator_stylesheet())
+        self.autocomplete_manager = None
+        self.autocomplete_widget = None
         self.initialise_ui()
+        self.setup_autocomplete()
 
     def _set_formatted_text(self, widget: QLineEdit, text: str):
         widget.setText(MathFormatter.to_display(text))
