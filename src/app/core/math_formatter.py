@@ -22,8 +22,6 @@ class MathFormatter:
         result = cls._convert_exponents(result)
         result = cls._hide_implicit_multiplication(result)
         result = result.replace('*', '×')
-        result = result.replace('/', '÷')
-
         return result
 
     @classmethod
