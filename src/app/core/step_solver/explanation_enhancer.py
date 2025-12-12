@@ -2,7 +2,7 @@ import os
 import json
 from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass, asdict
-from .explanation_text_library import ExplanationTexts
+from explanation_text_library import ExplanationTexts
 
 try:
     # modern OpenAI SDK
