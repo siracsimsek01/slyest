@@ -1,4 +1,3 @@
-### History Panel widget for the calculator
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel,
     QPushButton, QListWidget, QListWidgetItem
@@ -9,7 +8,6 @@ from PyQt6.QtGui import QFont
 from ..gui.history_window import HistoryWindow
 
 class HistoryPanel(QWidget):
-    ### widget that displays calculation history
     history_item_selected = pyqtSignal(dict)
     
     def __init__(self, session_manager=None, parent=None):
@@ -41,36 +39,27 @@ class HistoryPanel(QWidget):
         header_layout.addWidget(title)
         header_layout.addStretch()
         
-        # clear button
         self.clear_btn = QPushButton("Clear")
         self.clear_btn.setObjectName("historyToggle")
         self.clear_btn.clicked.connect(self.clear_history)
         header_layout.addWidget(self.clear_btn)
-        # layout.addLayout(header_layout)
 
-        # save button
         self.save_btn = QPushButton("Save")
         self.save_btn.setObjectName("historyToggle")
         self.save_btn.clicked.connect(self.export_history)
         header_layout.addWidget(self.save_btn)
-        # layout.addLayout(header_layout)
-
         return header_layout
     
     def create_history_list(self):
-        # self.calculation_history = list()
         history_list = QListWidget()
         history_list.setObjectName("historyList")
         history_list.itemDoubleClicked.connect(self.on_item_clicked)
-        # layout.addWidget(self.history_list)
-
         return history_list
         
     def create_instructions_label(self):
         instructions = QLabel("Double-click to reuse")
         instructions.setStyleSheet("color: #A0A0A0; font-size: 9pt; font-style: italic;")
         instructions.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        # layout.addWidget(instructions)
         return instructions
         
     def add_calculation(self, expression: str, result: str, operation=None, optional_expression=None):

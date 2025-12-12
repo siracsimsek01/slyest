@@ -15,12 +15,16 @@ from ..gui.learning_mode_window import LearningModeWindow
 from ..gui.history_panel import HistoryPanel
 from ..gui.calculator_operations import CalculatorOperations
 from ..gui.plotting_panel import PlottingPanel
+from ..gui.autocomplete_widget import AutoCompleteWidget
+from ..core.autocomplete.autocomplete_manager import AutocompleteManager
 from src.app.core.perform_substitution import Substitution
 from src.app.core.algebraic_expressions import AlgebraicExpressions
 from src.app.core.two_linear_equations import TwoLinearEquations
 from src.app.core.symbolic_to_decimal import toggle_format
 from ..core.session import SessionManager, HistoryEntry
 from sympy import sympify
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QKeyEvent
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -40,7 +44,13 @@ class MainWindow(QMainWindow):
         self.operation = ""
         self.used_vars = dict()
         self.setStyleSheet(get_calculator_stylesheet())
+
+        # Initialize autocomplete (will be set up after UI)
+        self.autocomplete_manager = None
+        self.autocomplete_widget = None
+
         self.initialise_ui()
+        self.setup_autocomplete()
 
     def _set_formatted_text(self, widget: QLineEdit, text: str):
         widget.setText(MathFormatter.to_display(text))
@@ -94,7 +104,7 @@ class MainWindow(QMainWindow):
 
         self.optional_expression_input = QLineEdit()
         self.optional_expression_input.setObjectName("optionalExpressionInput")
-        self.optional_expression_input.setPlaceholderText("Optional: e.g., x=5, y=3 for substitution <or> x - y = 12 for solving two linear equations....")
+        self.optional_expression_input.setPlaceholderText("Optional: e.g., x=5, y=3 for substitution <or> x - y = 12 for solving two linear equations, x for differentiation/integration, etc....")
 
         self.expression_input.setMinimumHeight(40)
         self.expression_input.returnPressed.connect(self.handle_expression_input)
@@ -145,6 +155,7 @@ class MainWindow(QMainWindow):
         button_layout.addWidget(self.create_new_button("Substitute", "symbolicBtn", lambda: self.handle_symbolic_operation('substitute'))) # substitute
         button_layout.addWidget(self.create_new_button("Solve 2 Equations", "symbolicBtn", lambda: self.handle_symbolic_operation('solve 2 equations'))) # sovle 2 equations
         button_layout.addWidget(self.create_new_button("Differentiate", "symbolicBtn", lambda: self.handle_symbolic_operation('differentiate'))) # differentiate
+        button_layout.addWidget(self.create_new_button("Integrate", "symbolicBtn", lambda: self.handle_symbolic_operation('integrate')))
         button_layout.addWidget(self.create_new_button("Plot", "symbolicBtn", self.open_plotting_panel))  # plot
         
         parent_layout.addWidget(button_container)
@@ -445,7 +456,8 @@ class MainWindow(QMainWindow):
             expression, answer = result
             self._set_formatted_text(self.expression_input, expression)
             self.display.setText(MathFormatter.to_display(answer))
-            self.history_panel.add_calculation(expression, answer)
+            if not "Error" in result:
+                self.history_panel.add_calculation(expression, answer)
 
     def handle_clear_click(self):
         result = self.operations.clear_all()
@@ -640,7 +652,9 @@ class MainWindow(QMainWindow):
                 result = str(self.two_equations_solver.solve_two_linear_equations(expression_string_processed, optional_expression_string_processed))
             elif operation == 'differentiate':
                 result = str(self.engine.differentiate(expression_string_processed, optional_expression_string_processed))
-            
+            elif operation == 'integrate':
+                result = str(self.engine.integrate(expression_string_processed, optional_expression_string_processed))
+
             self.display.setText(MathFormatter.to_display(result))
 
             self.history_panel.add_calculation(
@@ -690,9 +704,9 @@ class MainWindow(QMainWindow):
             print(f"Toggle failed: {result}")
 
     def launch_learning_mode(self):
-        if self.operation:
+        if self.operation and not self.is_invalid_result(self.display.text()):
             learning_mode_window = LearningModeWindow(self.operation, self.expression_input.text(),
-                self.display.text(), self.optional_expression_input.text() )
+                self.display.text(), self.optional_expression_input.text(), self.used_vars, self.engine )
             learning_mode_window.exec()
         else:
             QMessageBox.critical(self, "Error", "Learning mode is not available for this operation.")
@@ -701,18 +715,131 @@ class MainWindow(QMainWindow):
         return self._get_internal_text(self.expression_input)
     
     def open_plotting_panel(self):
+        from PyQt6.QtWidgets import QDialog
+
         self.plotting_dialog = QDialog(self)
         self.plotting_dialog.setWindowTitle("SLYEST - Plotting")
-        self.plotting_dialog.resize(900, 700)
+        self.plotting_dialog.resize(600, 300)
 
         layout = QVBoxLayout()
 
-        self.plotting_panel_instance = PlottingPanel(
-            application_reference=self,
-            parent=self.plotting_dialog
-        )
+        self.plotting_panel_instance = PlottingPanel(application_reference=self, parent=self.plotting_dialog)
         self.plotting_panel_instance.update_variables(self.engine.list_variables())
         layout.addWidget(self.plotting_panel_instance)
 
         self.plotting_dialog.setLayout(layout)
         self.plotting_dialog.show()
+
+    def is_invalid_result(self, result):
+        return "Error" in result or "Invalid" in result
+
+    def setup_autocomplete(self):
+        self.autocomplete_manager = AutocompleteManager(self.engine, self.history_panel)
+        self.autocomplete_widget = AutoCompleteWidget(self)
+
+        self.autocomplete_manager.suggestions_ready.connect(self.show_autocomplete_suggestions)
+        self.autocomplete_widget.suggestion_selected.connect(self.apply_suggestion)
+
+     
+        self.expression_input.textChanged.connect(
+            lambda text: self.autocomplete_manager.on_text_changed(text)
+        )
+        self.optional_expression_input.textChanged.connect(
+            lambda text: self.autocomplete_manager.on_text_changed(text)
+        )
+
+        self.expression_input.installEventFilter(self)
+        self.optional_expression_input.installEventFilter(self)
+
+    def show_autocomplete_suggestions(self, suggestions):
+        if not suggestions:
+            self.autocomplete_widget.hide()
+            return
+        
+        active_input = None
+        if self.expression_input.hasFocus():
+            active_input = self.expression_input
+        elif self.optional_expression_input.hasFocus():
+            active_input = self.optional_expression_input
+
+        if not active_input:
+            self.autocomplete_widget.hide()
+            return
+
+
+        self.autocomplete_widget.active_input = active_input
+
+        global_pos = active_input.mapToGlobal(active_input.rect().bottomLeft())
+        self.autocomplete_widget.move(global_pos)
+
+     
+        self.autocomplete_widget.show_suggestions(suggestions)
+
+        active_input.setFocus()
+
+    def apply_suggestion(self, suggestion):
+        active_input = getattr(self.autocomplete_widget, 'active_input', None)
+
+        if not active_input:
+            return
+        
+        current_text = self._get_internal_text(active_input)
+        cursor_pos = active_input.cursorPosition()
+
+        token_start, token_end = self._find_token_bounds(current_text, cursor_pos)
+
+        new_text = current_text[:token_start] + suggestion.text + current_text[token_end:]
+
+        self._set_formatted_text(active_input, new_text)
+
+        new_cursor_pos = token_start + len(suggestion.text)
+        active_input.setCursorPosition(new_cursor_pos)
+        
+        self.autocomplete_manager.on_suggestion_accepted(suggestion)
+
+        self.autocomplete_widget.hide()
+
+    def _find_token_bounds(self, text: str, cursor_pos: int) -> tuple:
+        """Find the start and end positions of the token at cursor position"""
+        import re
+
+        delimiters = r'[\+\-\*/\(\)\s,=]'
+
+        # Find start of token (go backwards from cursor)
+        start = cursor_pos
+        while start > 0 and not re.match(delimiters, text[start - 1]):
+            start -= 1
+
+        # Find end of token (go forwards from cursor)
+        end = cursor_pos
+        while end < len(text) and not re.match(delimiters, text[end]):
+            end += 1
+
+        return start, end
+
+    def eventFilter(self, obj, event):
+        """Handle keyboard events for autocomplete navigation"""
+        if obj in [self.expression_input, self.optional_expression_input]:
+            if event.type() == event.Type.KeyPress:
+                if self.autocomplete_widget and self.autocomplete_widget.isVisible():
+                    # nnly intercept specific navigation keys
+                    # all other keys pass through for normal typing
+                    key = event.key()
+
+                    if key == Qt.Key.Key_Down:
+                        self.autocomplete_widget.move_selection_down()
+                        return True
+                    elif key == Qt.Key.Key_Up:
+                        self.autocomplete_widget.move_selection_up()
+                        return True
+                    elif key in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
+                        self.autocomplete_widget.accept_current()
+                        return True
+                    elif key == Qt.Key.Key_Escape:
+                        self.autocomplete_widget.hide()
+                        return True
+                    elif key == Qt.Key.Key_Tab:
+                        self.autocomplete_widget.accept_current()
+                        return True
+
+        return super().eventFilter(obj, event)

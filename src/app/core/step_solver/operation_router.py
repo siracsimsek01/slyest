@@ -17,25 +17,29 @@ class OperationRouter:
             result['steps'] = self.enhancer.enhance_all_steps(result['steps'], context)
         return result
 
-    def generate_steps(self, operation: str, input_expr: str, optional_input: str = "") -> Dict:
-        result = None
-
+    def generate_steps(self, operation: str, input_expr: str, optional_input: str = "", result="") -> Dict:
         if operation == "solve":
-            result = self._solve_steps(input_expr)
+            if ", " in result:
+                operation = "solve quadratic"
+                result = self._solve_2_answer_steps(input_expr, result)
+            else:
+                result = self._solve_steps(input_expr, result)
         elif operation == "simplify":
-            result = self._simplify_steps(input_expr)
+            result = self._simplify_steps(input_expr, result)
         elif operation == "expand":
-            result = self._expand_steps(input_expr)
+            result = self._expand_steps(input_expr, result)
         elif operation == "factor":
-            result = self._factor_steps(input_expr)
+            result = self._factor_steps(input_expr, result)
         elif operation == "differentiate":
-            result = self._differentiate_steps(input_expr, optional_input)
+            result = self._differentiate_steps(input_expr, optional_input, result)
+        elif operation == "integrate":
+            result = self._integrate_steps(input_expr, optional_input, result)
         elif operation == "substitute":
-            result = self._substitute_steps(input_expr, optional_input)
+            result = self._substitute_steps(input_expr, optional_input, result)
         elif operation == "solve 2 equations":
-            result = self._solve_two_equations_steps(input_expr, optional_input)
+            result = self._solve_two_equations_steps(input_expr, optional_input, result)
         elif operation == "calculate":
-            result = self._calculate_steps(input_expr)
+            result = self._calculate_steps(input_expr, result)
         else:
             return {
                 'success': False,
@@ -45,18 +49,46 @@ class OperationRouter:
 
         return self._enhance_result(result, operation)
 
-    def _solve_steps(self, equation: str) -> Dict:
-        return self.linear_solver.solve_with_steps(equation)
-
-    def _simplify_steps(self, expr: str) -> Dict:
+    def _solve_steps(self, equation: str, result: str) -> Dict:
+        return self.linear_solver.solve_with_steps(equation, result)
+    
+    def _solve_2_answer_steps(self, equation: str, result: str) -> Dict:
         try:
-            parsed = parse_expr(expr)
-            result = simplify(parsed)
+            steps = [
+                {
+                    'title': 'Given expression',
+                    'expression': str(equation),
+                    'explanation': 'we need to solve this equation',
+                    'rule': 'starting point',
+                    'is_final': False
+                },
+                {
+                    'title': 'solve quardratic',
+                    'expression': str(result),
+                    'explanation': 'Solve the equation',
+                    'rule': 'solving linear equation',
+                    'is_final': True
+                }
+            ]
 
+            return {
+                'success': True,
+                'steps': steps,
+                'solution': result
+            }
+        except Exception as e:
+            return {
+                'success': False,
+                'error': str(e),
+                'steps': []
+            }
+
+    def _simplify_steps(self, expr: str, result: str) -> Dict:
+        try:
             steps = [
                 {
                     'title': 'given expression',
-                    'expression': str(parsed),
+                    'expression': str(expr),
                     'explanation': 'we need to simplify this expression',
                     'rule': 'starting point',
                     'is_final': False
@@ -82,16 +114,14 @@ class OperationRouter:
                 'steps': []
             }
 
-    def _expand_steps(self, expr: str) -> Dict:
+    def _expand_steps(self, expr: str, result: str) -> Dict:
         try:
             from sympy import Mul, Add, Pow
             parsed = parse_expr(expr)
-            result = expand(parsed)
-
             steps = [
                 {
                     'title': 'given expression',
-                    'expression': str(parsed),
+                    'expression': str(expr),
                     'explanation': 'we need to expand this expression',
                     'rule': 'starting point',
                     'is_final': False
@@ -172,15 +202,12 @@ class OperationRouter:
                 'steps': []
             }
 
-    def _factor_steps(self, expr: str) -> Dict:
+    def _factor_steps(self, expr: str, result: str) -> Dict:
         try:
-            parsed = parse_expr(expr)
-            result = factor(parsed)
-
             steps = [
                 {
                     'title': 'given expression',
-                    'expression': str(parsed),
+                    'expression': str(expr),
                     'explanation': 'we need to factor this expression',
                     'rule': 'starting point',
                     'is_final': False
@@ -206,25 +233,19 @@ class OperationRouter:
                 'steps': []
             }
 
-    def _differentiate_steps(self, expr: str, variable: str) -> Dict:
+    def _differentiate_steps(self, expr: str, variable: str, result: str) -> Dict:
         try:
-            if not variable:
-                variable = 'x'
-
-            parsed = parse_expr(expr)
-            var_symbol = symbols(variable)
-            result = diff(parsed, var_symbol)
-
+            variable = variable if variable else expr[0]
             steps = [
                 {
                     'title': 'given function',
-                    'expression': f'f({variable}) = {parsed}',
+                    'expression': f'f({variable}) = {expr}',
                     'explanation': f'we need to find the derivative with respect to {variable}',
                     'rule': 'starting point',
                     'is_final': False
                 },
                 {
-                    'title': 'derivative',
+                    'title': 'differentiate',
                     'expression': f"f'({variable}) = {result}",
                     'explanation': 'applied differentiation rules',
                     'rule': 'differentiation',
@@ -244,16 +265,53 @@ class OperationRouter:
                 'steps': []
             }
 
-    def _substitute_steps(self, expr: str, substitution: str) -> Dict:
+    def _integrate_steps(self, expr: str, variable: str, result: str) -> Dict:
         try:
-            parsed = parse_expr(expr)
-
+            variable = variable if variable else expr[0]
             steps = [
                 {
-                    'title': 'substitution',
-                    'expression': f'{parsed} with {substitution}',
+                    'title': 'given function',
+                    'expression': f'f({variable}) = {expr}',
+                    'explanation': f'we need to find the function from its derivative with respect to {variable}',
+                    'rule': 'starting point',
+                    'is_final': False
+                },
+                {
+                    'title': 'integrate',
+                    'expression': f"∫f({variable}) = {result}",
+                    'explanation': 'applied integration rules',
+                    'rule': 'integration',
+                    'is_final': True
+                }
+            ]
+
+            return {
+                'success': True,
+                'steps': steps,
+                'solution': result
+            }
+        except Exception as e:
+            return {
+                'success': False,
+                'error': str(e),
+                'steps': []
+            }
+
+    def _substitute_steps(self, expr: str, substitution: str, result: str) -> Dict:
+        try:
+            steps = [
+                {
+                    'title': 'given equation',
+                    'expression': f'{expr} with {substitution}',
                     'explanation': f'substitute values: {substitution}',
                     'rule': 'substitution',
+                    'is_final': False
+                },
+                {
+                    'title': 'substituted result',
+                    'expression': str(result),
+                    'explanation': f'substitue {substitution} into the expression',
+                    'rule': 'subsitution',
                     'is_final': True
                 }
             ]
@@ -270,14 +328,21 @@ class OperationRouter:
                 'steps': []
             }
 
-    def _solve_two_equations_steps(self, eq1: str, eq2: str) -> Dict:
+    def _solve_two_equations_steps(self, eq1: str, eq2: str, result: str) -> Dict:
         try:
             steps = [
                 {
-                    'title': 'system of equations',
-                    'expression': f'{eq1}\n{eq2}',
+                    'title': 'given equation',
+                    'expression': f'{eq1} , {eq2}',
                     'explanation': 'solving system of two linear equations',
                     'rule': 'starting point',
+                    'is_final': False
+                },
+                {
+                    'title': 'solve 2 equations',
+                    'expression': str("".join(i for i in result)),
+                    'explanation': 'perform two equations',
+                    'rule': 'two linear equation solver',
                     'is_final': True
                 }
             ]
@@ -294,11 +359,9 @@ class OperationRouter:
                 'steps': []
             }
 
-    def _calculate_steps(self, expr: str) -> Dict:
+    def _calculate_steps(self, expr: str, result: str) -> Dict:
         try:
             parsed = parse_expr(expr)
-            result = parsed.evalf()
-
             steps = [
                 {
                     'title': 'given expression',

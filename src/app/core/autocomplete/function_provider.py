@@ -83,12 +83,17 @@ class PatternStore:
 class FunctionProvider:
     decay_half_life_seconds = 60 * 60 * 24
 
-    def __init__(self, patterns_path: Path) -> None:
+    def __init__(self, patterns_path: Path = None) -> None:
         self.functions: Dict[str, str] = self._build_functions()
         self.constants: Dict[str, str] = self._build_constants()
         self.categories: Dict[str, str] = self._build_categories()
         self.history: List[str] = []
         self.usage: Dict[str, Dict[str, float]] = {}
+
+        # Default patterns path if not provided
+        if patterns_path is None:
+            patterns_path = Path(__file__).parent / "patterns.json"
+
         self.pattern_store = PatternStore(patterns_path)
 
     def get_suggestions(self, partial_text: str, max_results: int = 5) -> List[Suggestion]:
@@ -135,8 +140,7 @@ class FunctionProvider:
             score = self._history_score(expression, similarity)
             suggestions.append(
                 Suggestion(
-                    label=expression,
-                    value=expression,
+                    text=expression,
                     type=SuggestionType.HISTORY,
                     score=score,
                 )
@@ -157,10 +161,12 @@ class FunctionProvider:
 
             suggestions.append(
                 Suggestion(
+                    text=name,
                     label=label,
-                    value=name,
                     type=SuggestionType.FUNCTION,
                     score=score,
+                    description=description,
+                    category=self.categories.get(name)
                 )
             )
 
@@ -179,10 +185,11 @@ class FunctionProvider:
 
             suggestions.append(
                 Suggestion(
+                    text=name,
                     label=label,
-                    value=name,
                     type=SuggestionType.CONSTANT,
                     score=score,
+                    description=description
                 )
             )
 
@@ -199,10 +206,12 @@ class FunctionProvider:
 
             suggestions.append(
                 Suggestion(
+                    text=pattern.template,
                     label=label,
-                    value=pattern.template,
                     type=SuggestionType.PATTERN,
                     score=score,
+                    description=pattern.description,
+                    category=pattern.category
                 )
             )
 

@@ -7,7 +7,7 @@ class Substitution:
 
     def perform_substitution(self, expression_str, substitutions_dict):
         if not isinstance(expression_str, str) or not expression_str.strip():
-            return "No expression provided."
+            return "Error: No expression provided."
         if not isinstance(substitutions_dict, dict):
             return "Invalid substitution format"
         try:
@@ -25,4 +25,4 @@ class Substitution:
         except (sympy.SympifyError, TypeError, SyntaxError):
             return "Invalid mathematical expression"
         except Exception as e:
-            return "An expected error occured."
+            return "Error: An expected error occured."

@@ -39,6 +39,19 @@ class AutocompleteManager(QObject):
             self.suggestions_ready.emit([])
             return
 
+        # get current token to check if it's just a number
+        current_token = self._get_current_token(text)
+
+        # don't show autocomplete for pure numbers or operators
+        if current_token.replace('.', '').replace('-', '').isdigit():
+            self.suggestions_ready.emit([])
+            return
+
+        # don't show for empty or very short tokens
+        if len(current_token) < 1:
+            self.suggestions_ready.emit([])
+            return
+
         # restart debounce timer
         self.debounce_timer.stop()
         self.debounce_timer.start(self.debounce_delay)
@@ -47,7 +60,7 @@ class AutocompleteManager(QObject):
         text = self.pending_text
         self.current_input = text
 
-        # extract token at cursor (HARD)
+        # extract token at cursor
         current_token = self._get_current_token(text)
 
         # query all providers
@@ -131,14 +144,14 @@ class AutocompleteManager(QObject):
                 if suggestion.text in variables:
                     suggestion.score += 10
 
-            # recently used (check usage_count)
+            # recently used 
             if suggestion.usage_count > 0:
                 # logarithmic boost for frequency
                 import math
                 boost = min(15, 5 * math.log(suggestion.usage_count + 1))
                 suggestion.score += boost
 
-            # length penalty (prefer shorter suggestions)
+            # length penalty for very long suggestions
             word_count = len(suggestion.text.split())
             if word_count > 3:
                 penalty = (word_count - 3) * 2

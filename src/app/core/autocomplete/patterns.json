@@ -3,70 +3,70 @@
     {
       "name": "quadratic",
       "pattern": "x**2 + {b}*x + {c}",
-      "description": "Quadratic equation: ax^2 + bx + c",
+      "description": "Quadratic: x² + bx + c",
       "category": "algebra",
       "commonness": 95
     },
     {
       "name": "linear",
       "pattern": "{m}*x + {b}",
-      "description": "Linear function: mx + b",
+      "description": "Linear: mx + b",
       "category": "algebra",
       "commonness": 98
     },
     {
       "name": "binomial_expansion_square",
       "pattern": "(x + {a})**2",
-      "description": "Square of binomial: (x + a)^2",
+      "description": "Binomial square: (x + a)²",
       "category": "algebra",
       "commonness": 90
     },
     {
       "name": "difference_of_squares",
       "pattern": "(x + {a})*(x - {a})",
-      "description": "Difference of squares: x^2 - a^2",
+      "description": "Difference of squares: x² − a²",
       "category": "algebra",
       "commonness": 90
     },
     {
       "name": "product_of_binomials",
       "pattern": "(x + {a})*(x + {b})",
-      "description": "Product of two binomials",
+      "description": "Binomial product: (x + a)(x + b)",
       "category": "algebra",
       "commonness": 85
     },
     {
       "name": "rational_function",
       "pattern": "({a}*x + {b})/({c}*x + {d})",
-      "description": "Simple rational function",
+      "description": "Rational: (ax + b)/(cx + d)",
       "category": "algebra",
       "commonness": 80
     },
     {
       "name": "cubic",
       "pattern": "x**3 + {a}*x**2 + {b}*x + {c}",
-      "description": "Cubic polynomial",
+      "description": "Cubic: x³ + ax² + bx + c",
       "category": "algebra",
       "commonness": 75
     },
     {
       "name": "polynomial_degree_4",
       "pattern": "x**4 + {a}*x**3 + {b}*x**2 + {c}*x + {d}",
-      "description": "Quartic polynomial",
+      "description": "Quartic: x⁴ + ax³ + bx² + cx + d",
       "category": "algebra",
       "commonness": 60
     },
     {
       "name": "absolute_linear",
       "pattern": "abs({a}*x + {b})",
-      "description": "Absolute value of linear expression",
+      "description": "Absolute value: |ax + b|",
       "category": "algebra",
       "commonness": 80
     },
     {
       "name": "rational_with_square",
-      "pattern": "({a})/x**2",
-      "description": "Inverse square rational function",
+      "pattern": "{a}/x**2",
+      "description": "Inverse square: a/x²",
       "category": "algebra",
       "commonness": 70
     }
@@ -75,70 +75,70 @@
     {
       "name": "sine_function",
       "pattern": "{a}*sin({b}*x + {c})",
-      "description": "General sine function",
+      "description": "Sine wave: a·sin(bx + c)",
       "category": "trigonometry",
       "commonness": 95
     },
     {
       "name": "cosine_function",
       "pattern": "{a}*cos({b}*x + {c})",
-      "description": "General cosine function",
+      "description": "Cosine wave: a·cos(bx + c)",
       "category": "trigonometry",
       "commonness": 95
     },
     {
       "name": "tangent_function",
       "pattern": "tan({a}*x + {b})",
-      "description": "General tangent function",
+      "description": "Tangent: tan(ax + b)",
       "category": "trigonometry",
       "commonness": 80
     },
     {
       "name": "sin_squared_plus_cos_squared",
       "pattern": "sin(x)**2 + cos(x)**2",
-      "description": "Identity sin^2(x) + cos^2(x) = 1",
+      "description": "Pythagorean identity: sin²(x) + cos²(x) = 1",
       "category": "trigonometry",
       "commonness": 90
     },
     {
       "name": "sine_sum",
       "pattern": "sin(x) + sin({a}*x)",
-      "description": "Sum of sine functions",
+      "description": "Sine sum: sin(x) + sin(ax)",
       "category": "trigonometry",
       "commonness": 70
     },
     {
       "name": "cosine_sum",
       "pattern": "cos(x) + cos({a}*x)",
-      "description": "Sum of cosine functions",
+      "description": "Cosine sum: cos(x) + cos(ax)",
       "category": "trigonometry",
       "commonness": 70
     },
     {
       "name": "sine_times_cosine",
       "pattern": "sin(x)*cos(x)",
-      "description": "Product of sine and cosine",
+      "description": "Product: sin(x)·cos(x)",
       "category": "trigonometry",
       "commonness": 75
     },
     {
       "name": "sine_double_angle",
       "pattern": "2*sin(x)*cos(x)",
-      "description": "Double-angle identity for sine",
+      "description": "Double angle: 2sin(x)cos(x) = sin(2x)",
       "category": "trigonometry",
       "commonness": 85
     },
     {
       "name": "cosine_double_angle",
       "pattern": "cos(x)**2 - sin(x)**2",
-      "description": "Double-angle identity for cosine",
+      "description": "Double angle: cos²(x) − sin²(x) = cos(2x)",
       "category": "trigonometry",
       "commonness": 85
     },
     {
       "name": "trig_rational",
       "pattern": "sin(x)/cos(x)",
-      "description": "Tangent as ratio of sine and cosine",
+      "description": "Tangent ratio: sin(x)/cos(x) = tan(x)",
       "category": "trigonometry",
       "commonness": 80
     }
@@ -147,70 +147,70 @@
     {
       "name": "exponential_growth",
       "pattern": "{a}*exp({b}*x)",
-      "description": "Exponential growth model",
+      "description": "Exponential growth: a·e^(bx)",
       "category": "exponential",
       "commonness": 95
     },
     {
       "name": "exponential_decay",
       "pattern": "{a}*exp(-{b}*x)",
-      "description": "Exponential decay model",
+      "description": "Exponential decay: a·e^(−bx)",
       "category": "exponential",
       "commonness": 95
     },
     {
       "name": "power_law",
       "pattern": "{a}*x**{b}",
-      "description": "Power law relation",
+      "description": "Power law: a·x^b",
       "category": "exponential",
       "commonness": 85
     },
     {
       "name": "logarithmic",
-      "pattern": "{a}*log(x) + {b}",
-      "description": "Logarithmic model",
+      "pattern": "{a}*log({b}*x) + {c}",
+      "description": "Logarithmic: a·log(bx) + c",
       "category": "logarithmic",
       "commonness": 85
     },
     {
       "name": "natural_logarithmic",
-      "pattern": "{a}*ln(x) + {b}",
-      "description": "Natural log model",
+      "pattern": "{a}*ln({b}*x) + {c}",
+      "description": "Natural log: a·ln(bx) + c",
       "category": "logarithmic",
       "commonness": 85
     },
     {
       "name": "compound_interest",
       "pattern": "{p}*(1 + {r})**{n}",
-      "description": "Compound interest formula",
+      "description": "Compound interest: P(1 + r)^n",
       "category": "exponential",
       "commonness": 90
     },
     {
       "name": "continuous_compound_interest",
       "pattern": "{p}*exp({r}*{t})",
-      "description": "Continuous compound interest formula",
+      "description": "Continuous interest: Pe^(rt)",
       "category": "exponential",
       "commonness": 85
     },
     {
       "name": "log_sum",
       "pattern": "log(x) + log({a})",
-      "description": "Sum of logarithms",
+      "description": "Log sum: log(x) + log(a) = log(xa)",
       "category": "logarithmic",
       "commonness": 70
     },
     {
       "name": "log_difference",
       "pattern": "log(x) - log({a})",
-      "description": "Difference of logarithms",
+      "description": "Log difference: log(x) − log(a) = log(x/a)",
       "category": "logarithmic",
       "commonness": 70
     },
     {
       "name": "log_ratio",
       "pattern": "log(x/{a})",
-      "description": "Logarithm of a ratio",
+      "description": "Log of ratio: log(x/a)",
       "category": "logarithmic",
       "commonness": 75
     }
@@ -218,71 +218,71 @@
   "calculus": [
     {
       "name": "derivative_power_rule",
-      "pattern": "d/dx(x**{n})",
-      "description": "Derivative using power rule",
+      "pattern": "{n}*x**({n}-1)",
+      "description": "Power rule: d/dx[x^n] = nx^(n−1)",
       "category": "calculus",
       "commonness": 90
     },
     {
       "name": "derivative_exponential",
-      "pattern": "d/dx(exp({a}*x))",
-      "description": "Derivative of exponential function",
+      "pattern": "{a}*exp({a}*x)",
+      "description": "Exponential derivative: d/dx[e^(ax)] = ae^(ax)",
       "category": "calculus",
       "commonness": 85
     },
     {
       "name": "derivative_sine",
-      "pattern": "d/dx(sin({a}*x))",
-      "description": "Derivative of sine function",
+      "pattern": "{a}*cos({a}*x)",
+      "description": "Sine derivative: d/dx[sin(ax)] = a·cos(ax)",
       "category": "calculus",
       "commonness": 85
     },
     {
       "name": "derivative_cosine",
-      "pattern": "d/dx(cos({a}*x))",
-      "description": "Derivative of cosine function",
+      "pattern": "-{a}*sin({a}*x)",
+      "description": "Cosine derivative: d/dx[cos(ax)] = −a·sin(ax)",
       "category": "calculus",
       "commonness": 85
     },
     {
-      "name": "indefinite_integral_power",
-      "pattern": "∫ x**{n} dx",
-      "description": "Indefinite integral of x^n",
+      "name": "integral_power",
+      "pattern": "x**({n}+1)/({n}+1)",
+      "description": "Power integral: ∫x^n dx = x^(n+1)/(n+1) + C",
       "category": "calculus",
       "commonness": 90
     },
     {
-      "name": "indefinite_integral_exponential",
-      "pattern": "∫ exp({a}*x) dx",
-      "description": "Indefinite integral of exponential",
+      "name": "integral_exponential",
+      "pattern": "(1/{a})*exp({a}*x)",
+      "description": "Exponential integral: ∫e^(ax) dx = (1/a)e^(ax) + C",
       "category": "calculus",
       "commonness": 80
     },
     {
-      "name": "indefinite_integral_sine",
-      "pattern": "∫ sin({a}*x) dx",
-      "description": "Indefinite integral of sine",
+      "name": "integral_sine",
+      "pattern": "-(1/{a})*cos({a}*x)",
+      "description": "Sine integral: ∫sin(ax) dx = −(1/a)cos(ax) + C",
       "category": "calculus",
       "commonness": 80
     },
     {
-      "name": "indefinite_integral_cosine",
-      "pattern": "∫ cos({a}*x) dx",
-      "description": "Indefinite integral of cosine",
+      "name": "integral_cosine",
+      "pattern": "(1/{a})*sin({a}*x)",
+      "description": "Cosine integral: ∫cos(ax) dx = (1/a)sin(ax) + C",
       "category": "calculus",
       "commonness": 80
     },
     {
-      "name": "definite_integral_basic",
-      "pattern": "∫_{a}^{b} f(x) dx",
-      "description": "Definite integral from a to b",
+      "name": "chain_rule",
+      "pattern": "f'(g(x))*g'(x)",
+      "description": "Chain rule: d/dx[f(g(x))] = f'(g(x))·g'(x)",
       "category": "calculus",
       "commonness": 85
     },
     {
-      "name": "limit_basic",
-      "pattern": "lim_{x->a} f(x)",
-      "description": "Limit of function at point a",
+      "name": "product_rule",
+      "pattern": "f(x)*g'(x) + f'(x)*g(x)",
+      "description": "Product rule: d/dx[f·g] = f·g' + f'·g",
       "category": "calculus",
       "commonness": 85
     }
@@ -291,70 +291,70 @@
     {
       "name": "arithmetic_mean",
       "pattern": "({x1} + {x2} + {x3})/3",
-      "description": "Arithmetic mean of three values",
+      "description": "Mean: (x₁ + x₂ + x₃)/3",
       "category": "statistics",
       "commonness": 90
     },
     {
       "name": "weighted_mean",
       "pattern": "({w1}*{x1} + {w2}*{x2})/({w1} + {w2})",
-      "description": "Weighted mean of two values",
+      "description": "Weighted mean: (w₁x₁ + w₂x₂)/(w₁ + w₂)",
       "category": "statistics",
       "commonness": 80
     },
     {
       "name": "variance_sample",
-      "pattern": "sum((x_i - mean)**2)/({n}-1)",
-      "description": "Sample variance formula",
+      "pattern": "sum((x - mean)**2)/({n}-1)",
+      "description": "Variance: Σ(x − μ)²/(n−1)",
       "category": "statistics",
       "commonness": 85
     },
     {
       "name": "standard_deviation",
       "pattern": "sqrt(variance)",
-      "description": "Standard deviation as square root of variance",
+      "description": "Standard deviation: σ = √variance",
       "category": "statistics",
       "commonness": 85
     },
     {
       "name": "z_score",
-      "pattern": "({x} - mean)/std",
-      "description": "Z-score formula",
+      "pattern": "({x} - {mean})/{std}",
+      "description": "Z-score: z = (x − μ)/σ",
       "category": "statistics",
       "commonness": 85
     },
     {
-      "name": "linear_regression_line",
-      "pattern": "{a}*x + {b}",
-      "description": "Simple linear regression line",
+      "name": "linear_regression",
+      "pattern": "{slope}*x + {intercept}",
+      "description": "Linear regression: ŷ = mx + b",
       "category": "statistics",
       "commonness": 80
     },
     {
       "name": "probability_binomial",
-      "pattern": "nCr({n}, {k})*p**{k}*(1-p)**({n}-{k})",
-      "description": "Binomial probability formula",
+      "pattern": "nCr({n}, {k})*{p}**{k}*(1-{p})**({n}-{k})",
+      "description": "Binomial probability: C(n,k)·p^k·(1−p)^(n−k)",
       "category": "statistics",
       "commonness": 80
     },
     {
       "name": "probability_geometric",
-      "pattern": "(1-p)**({k}-1)*p",
-      "description": "Geometric probability formula",
+      "pattern": "(1-{p})**({k}-1)*{p}",
+      "description": "Geometric probability: (1−p)^(k−1)·p",
       "category": "statistics",
       "commonness": 75
     },
     {
-      "name": "bayes_theorem",
-      "pattern": "(P_A_given_B*P_B)/P_A",
-      "description": "Bayes theorem pattern",
+      "name": "correlation_coefficient",
+      "pattern": "sum((x-mean_x)*(y-mean_y))/sqrt(sum((x-mean_x)**2)*sum((y-mean_y)**2))",
+      "description": "Correlation: r = Σ[(x−x̄)(y−ȳ)]/√[Σ(x−x̄)²·Σ(y−ȳ)²]",
       "category": "statistics",
       "commonness": 75
     },
     {
-      "name": "normal_distribution_pdf",
-      "pattern": "(1/(sqrt(2*pi)*sigma))*exp(-(x-mu)**2/(2*sigma**2))",
-      "description": "Normal distribution probability density function",
+      "name": "normal_distribution",
+      "pattern": "(1/(sqrt(2*pi)*{sigma}))*exp(-({x}-{mu})**2/(2*{sigma}**2))",
+      "description": "Normal PDF: (1/σ√2π)·e^(−(x−μ)²/2σ²)",
       "category": "statistics",
       "commonness": 80
     }
