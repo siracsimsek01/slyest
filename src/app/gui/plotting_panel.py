@@ -122,7 +122,7 @@ class PlottingPanel(QWidget):
         main_layout.addWidget(group_box)
         self.setLayout(main_layout)
     
-    def _create_range_controls(self):
+    def create_range_row(self):
         layout = QHBoxLayout()
 
         layout.addWidget(QLabel("Variable:"))
